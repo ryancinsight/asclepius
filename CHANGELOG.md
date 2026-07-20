@@ -12,3 +12,5 @@ All externally observable changes are recorded here.
   temperature histories.
 - Const-generic independent-insult composition, GAT response contracts, and
   borrowed-or-owned tissue identity.
+- Backend-generic Coeus gEUD tape construction with zero-copy validation,
+  stabilized forward evaluation, and analytical-gradient conformance.
