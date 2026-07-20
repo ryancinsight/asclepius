@@ -39,9 +39,9 @@ Create the Asclepius workspace with a pure `asclepius` law crate.
 - `TemperatureSamples<I, T>` carries an exact-size one-pass iterator.
   `UniformTemperatureObservation<T>` lets the same integration kernel consume
   borrowed quantities or lazily converted consumer storage without allocation,
-  copying, dynamic dispatch, or parallel owned/borrowed APIs. Public
-  single-step increments reuse the same CEM43 and Arrhenius kernels for spatial
-  solvers.
+  copying, dynamic dispatch, or parallel owned/borrowed APIs. The public CEM43
+  rate and single-step CEM43 and Arrhenius increments reuse the same kernels
+  for spatial solvers.
 - `IndependentInsults<const N: usize>` is a const-generic ZST that specializes
   the real fixed mechanism count without runtime dispatch.
 - `Tissue<'a, Model>` uses `Cow<'a, str>` for borrowed catalogs and owned
