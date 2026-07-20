@@ -159,6 +159,13 @@ fn single_increment_matches_singleton_history() {
 fn thermal_laws_reject_invalid_boundaries() {
     assert!(TemperatureHistory::new(&[], Time::from_base(0.0_f64)).is_err());
     assert!(
+        TemperatureSamples::new(
+            core::iter::empty::<ThermodynamicTemperature<f64>>(),
+            Time::from_base(0.0),
+        )
+        .is_err()
+    );
+    assert!(
         ArrheniusDamage::new(
             ReciprocalTime::from_base(0.0_f64),
             MolarEnergy::from_base(1.0),
@@ -179,5 +186,19 @@ fn thermal_laws_reject_invalid_boundaries() {
     assert_eq!(
         Cem43::canonical().evaluate_uniform(empty),
         Err(asclepius::ResponseError::EmptyObservation)
+    );
+
+    let one = TemperatureSamples::new(
+        core::iter::once(ThermodynamicTemperature::from_base(316.15_f64)),
+        Time::from_base(1.0),
+    )
+    .expect("valid observation");
+    let mut no_output = [];
+    assert_eq!(
+        Cem43::canonical().cumulative_into(one, &mut no_output),
+        Err(asclepius::ResponseError::OutputLength {
+            expected: 1,
+            actual: 0,
+        })
     );
 }
