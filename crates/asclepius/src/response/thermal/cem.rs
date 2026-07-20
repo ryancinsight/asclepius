@@ -11,7 +11,7 @@ use crate::{
     },
 };
 
-use super::TemperatureHistory;
+use super::{TemperatureHistory, UniformTemperatureObservation};
 
 /// Cumulative equivalent minutes at 43 degrees Celsius.
 ///
@@ -72,20 +72,73 @@ impl<T: RealField> Cem43<T> {
         self.reference
     }
 
+    /// Evaluate one uniform-step exposure increment.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`ResponseError`] when the temperature or step lies outside the
+    /// law's finite positive domain or the increment is non-finite.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use aequitas::systems::si::quantities::{ThermodynamicTemperature, Time};
+    /// use asclepius::response::thermal::Cem43;
+    ///
+    /// let increment = Cem43::canonical()
+    ///     .increment(
+    ///         ThermodynamicTemperature::from_base(317.15_f64),
+    ///         Time::from_base(60.0),
+    ///     )
+    ///     .expect("valid observation");
+    /// assert_eq!(increment.get().into_base(), 120.0);
+    /// ```
+    pub fn increment(
+        &self,
+        temperature: ThermodynamicTemperature<T>,
+        step: Time<T>,
+    ) -> Result<EquivalentExposure<T>, ResponseError<T>> {
+        validation::positive(ValueKind::Temperature, *temperature.as_base())?;
+        validation::positive(ValueKind::TimeStep, *step.as_base())?;
+        self.increment_validated(temperature, step)
+    }
+
+    /// Evaluate any supported uniform temperature observation.
+    ///
+    /// Borrowed histories and lazy exact-size sample streams share this method
+    /// and the same monomorphized integration kernel.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`ResponseError`] for an empty observation, invalid
+    /// temperature, or non-finite accumulation.
+    pub fn evaluate_uniform<O>(
+        &self,
+        observation: O,
+    ) -> Result<EquivalentExposure<T>, ResponseError<T>>
+    where
+        O: UniformTemperatureObservation<T>,
+    {
+        self.integrate(observation, &mut DiscardExposure)
+    }
+
     /// Evaluate cumulative equivalent exposure into caller-owned storage.
     ///
     /// # Errors
     ///
     /// Returns [`ResponseError`] for an empty history, invalid temperature,
     /// non-finite accumulation, or output-length mismatch.
-    pub fn cumulative_into(
+    pub fn cumulative_into<O>(
         &self,
-        history: TemperatureHistory<'_, T>,
+        history: O,
         output: &mut [EquivalentExposure<T>],
-    ) -> Result<(), ResponseError<T>> {
-        if output.len() != history.samples().len() {
+    ) -> Result<(), ResponseError<T>>
+    where
+        O: UniformTemperatureObservation<T>,
+    {
+        if output.len() != history.len() {
             return Err(ResponseError::OutputLength {
-                expected: history.samples().len(),
+                expected: history.len(),
                 actual: output.len(),
             });
         }
@@ -94,28 +147,25 @@ impl<T: RealField> Cem43<T> {
         Ok(())
     }
 
-    fn integrate<S: ExposureSink<T>>(
+    fn integrate<O, S>(
         &self,
-        history: TemperatureHistory<'_, T>,
+        history: O,
         sink: &mut S,
-    ) -> Result<EquivalentExposure<T>, ResponseError<T>> {
-        if history.samples().is_empty() {
+    ) -> Result<EquivalentExposure<T>, ResponseError<T>>
+    where
+        O: UniformTemperatureObservation<T>,
+        S: ExposureSink<T>,
+    {
+        if history.is_empty() {
             return Err(ResponseError::EmptyObservation);
         }
 
-        let inverse_kelvin = ReciprocalTemperature::from_base(<T as NumericElement>::ONE);
+        let step = history.step();
         let mut accumulated = Time::from_base(<T as NumericElement>::ZERO);
-        for (index, &temperature) in history.samples().iter().enumerate() {
+        for (index, temperature) in history.into_samples().enumerate() {
             validation::positive(ValueKind::Temperature, *temperature.as_base())
                 .map_err(|source| ResponseError::InvalidObservation { index, source })?;
-            let factor = if temperature >= self.reference {
-                self.at_or_above.get()
-            } else {
-                self.below.get()
-            };
-            let exponent: Dimensionless<T> = inverse_kelvin * (self.reference - temperature);
-            let increment = history.step() * factor.powf(exponent.into_base());
-            accumulated += increment;
+            accumulated += self.increment_validated(temperature, step)?.get();
             if !accumulated.as_base().is_finite() {
                 return Err(ResponseError::NonFiniteResult {
                     kind: ValueKind::EquivalentExposure,
@@ -126,6 +176,28 @@ impl<T: RealField> Cem43<T> {
             sink.write(index, exposure);
         }
         EquivalentExposure::new(accumulated).map_err(ResponseError::from)
+    }
+
+    fn increment_validated(
+        &self,
+        temperature: ThermodynamicTemperature<T>,
+        step: Time<T>,
+    ) -> Result<EquivalentExposure<T>, ResponseError<T>> {
+        let inverse_kelvin = ReciprocalTemperature::from_base(<T as NumericElement>::ONE);
+        let factor = if temperature >= self.reference {
+            self.at_or_above.get()
+        } else {
+            self.below.get()
+        };
+        let exponent: Dimensionless<T> = inverse_kelvin * (self.reference - temperature);
+        let increment = step * factor.powf(exponent.into_base());
+        if !increment.as_base().is_finite() {
+            return Err(ResponseError::NonFiniteResult {
+                kind: ValueKind::EquivalentExposure,
+                value: *increment.as_base(),
+            });
+        }
+        EquivalentExposure::new(increment).map_err(ResponseError::from)
     }
 }
 

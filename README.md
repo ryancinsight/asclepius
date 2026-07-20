@@ -55,9 +55,11 @@ let tcp = tcp_model.evaluate(geud).expect("valid equivalent dose");
 assert!(tcp.get() > 0.5);
 ```
 
-All observations are borrowed. Cumulative thermal evaluations write into
-caller-owned slices, and tissue names use `Cow<str>` so static catalogs borrow
-while runtime-defined tissues own.
+Dose observations are borrowed. Thermal laws accept either borrowed absolute
+temperatures or an exact-size one-pass iterator, so consumers can lazily map
+their storage into Aequitas quantities without an intermediate collection.
+Cumulative evaluations write into caller-owned slices, and tissue names use
+`Cow<str>` so static catalogs borrow while runtime-defined tissues own.
 
 ## Architecture
 
@@ -72,7 +74,7 @@ crates/
 │   │   │   ├── logistic_control.rs
 │   │   │   └── normal_complication.rs
 │   │   ├── thermal/
-│   │   │   ├── history.rs
+│   │   │   ├── history.rs          # borrowed and streamed observations
 │   │   │   ├── arrhenius.rs
 │   │   │   └── cem.rs
 │   │   └── composition/
@@ -97,6 +99,11 @@ leaf, dependencies point inward, and the core crate is `no_std + alloc`.
 `BiologicalResponse<T>` uses a GAT for borrowed observations and associated
 output/error types. Models monomorphize over `T: eunomia::RealField`; there is
 no vtable, scalar widening, unit metadata, or hidden allocation.
+`UniformTemperatureObservation<T>` seals the two supported observation shapes:
+borrowed `TemperatureHistory` and generic `TemperatureSamples<I, T>`.
+The iterator stays inline and monomorphizes into the same integration kernel;
+single-step CEM43 and Arrhenius methods reuse the identical increment law for
+spatial solvers.
 
 `asclepius-coeus` depends outward on Coeus while core remains independent. Its
 gEUD operation is monomorphized over the Coeus backend, validates borrowed
@@ -159,9 +166,11 @@ Executable evidence includes generalized-mean bounds and homogeneity,
 TCP/NTCP midpoint and monotonicity, CEM43 reference cases, Arrhenius
 non-decreasing damage and survival identity, const-generic composition bounds,
 `f32`/`f64` instantiation, transparent layout, ZST routing, allocation-free
-borrowed evaluation, and differential comparison with the pre-extraction
-consumer formulas. The Coeus adapter adds core-value, closed-form-gradient,
-large-finite-dose, invalid-domain, and Sequential/Moirai backend contracts.
+borrowed and streamed evaluation, streamed/borrowed bitwise equivalence,
+single-step/history equivalence, and differential comparison with the
+pre-extraction consumer formulas. The Coeus adapter adds core-value,
+closed-form-gradient, large-finite-dose, invalid-domain, and
+Sequential/Moirai backend contracts.
 
 ## License
 

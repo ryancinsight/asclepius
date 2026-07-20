@@ -36,6 +36,12 @@ Create the Asclepius workspace with a pure `asclepius` law crate.
 - `TemperatureHistory` borrows a quantity slice. Cumulative evaluation writes
   into caller-owned storage through monomorphized internal sinks; final-only
   evaluation uses a zero-sized discard sink.
+- `TemperatureSamples<I, T>` carries an exact-size one-pass iterator.
+  `UniformTemperatureObservation<T>` lets the same integration kernel consume
+  borrowed quantities or lazily converted consumer storage without allocation,
+  copying, dynamic dispatch, or parallel owned/borrowed APIs. Public
+  single-step increments reuse the same CEM43 and Arrhenius kernels for spatial
+  solvers.
 - `IndependentInsults<const N: usize>` is a const-generic ZST that specializes
   the real fixed mechanism count without runtime dispatch.
 - `Tissue<'a, Model>` uses `Cow<'a, str>` for borrowed catalogs and owned
@@ -124,7 +130,9 @@ any `p_j` is the non-negative product of the remaining survival factors.
 4. Replace Helios scalar response functions and its Coeus gEUD tape expression
    with Asclepius-owned APIs; delete superseded code.
 5. Replace Kwavers CEM43, Arrhenius, and independent-insult arithmetic while
-   retaining grids, therapy workflows, and tissue parameter catalogs.
+   retaining grids, therapy workflows, and tissue parameter catalogs. Map its
+   Celsius storage lazily at the Aequitas boundary and reuse single-step law
+   increments in spatial solvers.
 6. Register the repository in Atlas and run cross-package contract tests.
 
 No forwarding wrappers, compatibility aliases, or fallback implementations
@@ -140,7 +148,8 @@ remain after each consumer migration.
 - midpoint, range, and monotonicity for TCP and NTCP;
 - const-generic independent-insult composition;
 - GAT borrowing, `Cow` pointer identity, transparent layouts, and ZST sizes;
-- allocation-free borrowed evaluation;
+- allocation-free borrowed and streamed evaluation, streamed/borrowed bitwise
+  equivalence, and single-step/history equivalence;
 - no-default-features, Clippy, Nextest, doctests, rustdoc, examples,
   supply-chain, and semver gates;
 - consumer package tests after direct integration.
