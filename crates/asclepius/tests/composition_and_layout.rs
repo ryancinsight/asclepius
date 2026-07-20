@@ -2,10 +2,17 @@
 
 use core::mem::{align_of, size_of};
 
-use aequitas::systems::si::quantities::{AbsorbedDose, Time};
+use aequitas::systems::si::{
+    quantities::{AbsorbedDose, ThermodynamicTemperature, Time},
+    units::Second,
+};
 use asclepius::{
     BiologicalResponse, DamageIntegral, EquivalentExposure, Probability, ResponseSlope, Tissue,
-    response::composition::IndependentInsults, response::radiation::LogisticControlProbability,
+    response::{
+        composition::IndependentInsults,
+        radiation::LogisticControlProbability,
+        thermal::{Cem43, TemperatureSamples},
+    },
 };
 use stats_alloc::{INSTRUMENTED_SYSTEM, Region, StatsAlloc};
 
@@ -63,6 +70,31 @@ fn borrowed_tissue_evaluation_is_allocation_free() {
 
     assert_eq!(response.get().to_bits(), 0.5_f64.to_bits());
     assert_eq!(tissue.name().as_ptr(), "reference tissue".as_ptr());
+    assert_eq!(change.allocations, 0);
+    assert_eq!(change.reallocations, 0);
+    assert_eq!(change.deallocations, 0);
+}
+
+#[test]
+fn lazy_temperature_conversion_is_allocation_free() {
+    const KELVIN_OFFSET: f64 = 273.15;
+    let celsius = [42.0_f64, 43.0, 44.0];
+    let region = Region::new(ALLOCATOR);
+
+    let observation = TemperatureSamples::new(
+        celsius
+            .iter()
+            .copied()
+            .map(|value| ThermodynamicTemperature::from_base(value + KELVIN_OFFSET)),
+        Time::from_unit::<Second>(60.0),
+    )
+    .expect("valid stream");
+    let exposure = Cem43::canonical()
+        .evaluate_uniform(observation)
+        .expect("valid temperature stream");
+    let change = region.change();
+
+    assert_eq!(exposure.get().into_base().to_bits(), 195.0_f64.to_bits());
     assert_eq!(change.allocations, 0);
     assert_eq!(change.reallocations, 0);
     assert_eq!(change.deallocations, 0);

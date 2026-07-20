@@ -1,5 +1,5 @@
 use aequitas::systems::si::quantities::{
-    Dimensionless, MolarEnergy, MolarHeatCapacity, ReciprocalTime,
+    Dimensionless, MolarEnergy, MolarHeatCapacity, ReciprocalTime, ThermodynamicTemperature, Time,
 };
 use eunomia::{NumericElement, RealField};
 
@@ -8,7 +8,7 @@ use crate::{
     value::{DamageIntegral, InvalidValue, Probability, ResponseError, ValueKind, validation},
 };
 
-use super::TemperatureHistory;
+use super::{TemperatureHistory, UniformTemperatureObservation};
 
 /// First-order Arrhenius thermal-damage law.
 ///
@@ -71,6 +71,36 @@ impl<T: RealField> ArrheniusDamage<T> {
         self.gas_constant
     }
 
+    /// Evaluate the instantaneous first-order damage rate.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`ResponseError`] when the absolute temperature is not finite
+    /// and positive.
+    pub fn rate(
+        &self,
+        temperature: ThermodynamicTemperature<T>,
+    ) -> Result<ReciprocalTime<T>, ResponseError<T>> {
+        validation::positive(ValueKind::Temperature, *temperature.as_base())?;
+        Ok(self.rate_validated(temperature))
+    }
+
+    /// Evaluate one rectangle-rule damage increment.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`ResponseError`] when the temperature or step lies outside the
+    /// finite positive domain.
+    pub fn increment(
+        &self,
+        temperature: ThermodynamicTemperature<T>,
+        step: Time<T>,
+    ) -> Result<DamageIntegral<T>, ResponseError<T>> {
+        validation::positive(ValueKind::Temperature, *temperature.as_base())?;
+        validation::positive(ValueKind::TimeStep, *step.as_base())?;
+        self.increment_validated(temperature, step)
+    }
+
     /// Convert accumulated damage to surviving fraction.
     #[must_use]
     pub fn survival(damage: DamageIntegral<T>) -> Probability<T> {
@@ -84,6 +114,22 @@ impl<T: RealField> ArrheniusDamage<T> {
         Probability::from_validated(one - (-damage.get()).exp())
     }
 
+    /// Evaluate any supported uniform temperature observation.
+    ///
+    /// Borrowed histories and lazy exact-size sample streams share this method
+    /// and the same monomorphized integration kernel.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`ResponseError`] for an empty observation, invalid
+    /// temperature, or non-finite accumulation.
+    pub fn evaluate_uniform<O>(&self, observation: O) -> Result<DamageIntegral<T>, ResponseError<T>>
+    where
+        O: UniformTemperatureObservation<T>,
+    {
+        self.integrate(observation, &mut DiscardDamage)
+    }
+
     /// Evaluate cumulative damage into caller-owned storage.
     ///
     /// The output at index `i` is damage accumulated through sample `i`.
@@ -93,14 +139,17 @@ impl<T: RealField> ArrheniusDamage<T> {
     ///
     /// Returns [`ResponseError`] for an empty history, invalid temperature,
     /// non-finite accumulation, or output-length mismatch.
-    pub fn cumulative_into(
+    pub fn cumulative_into<O>(
         &self,
-        history: TemperatureHistory<'_, T>,
+        history: O,
         output: &mut [DamageIntegral<T>],
-    ) -> Result<(), ResponseError<T>> {
-        if output.len() != history.samples().len() {
+    ) -> Result<(), ResponseError<T>>
+    where
+        O: UniformTemperatureObservation<T>,
+    {
+        if output.len() != history.len() {
             return Err(ResponseError::OutputLength {
-                expected: history.samples().len(),
+                expected: history.len(),
                 actual: output.len(),
             });
         }
@@ -109,26 +158,25 @@ impl<T: RealField> ArrheniusDamage<T> {
         Ok(())
     }
 
-    fn integrate<S: DamageSink<T>>(
+    fn integrate<O, S>(
         &self,
-        history: TemperatureHistory<'_, T>,
+        history: O,
         sink: &mut S,
-    ) -> Result<DamageIntegral<T>, ResponseError<T>> {
-        if history.samples().is_empty() {
+    ) -> Result<DamageIntegral<T>, ResponseError<T>>
+    where
+        O: UniformTemperatureObservation<T>,
+        S: DamageSink<T>,
+    {
+        if history.is_empty() {
             return Err(ResponseError::EmptyObservation);
         }
 
+        let step = history.step();
         let mut accumulated = <T as NumericElement>::ZERO;
-        for (index, &temperature) in history.samples().iter().enumerate() {
-            let absolute = validation::positive(ValueKind::Temperature, *temperature.as_base())
+        for (index, temperature) in history.into_samples().enumerate() {
+            validation::positive(ValueKind::Temperature, *temperature.as_base())
                 .map_err(|source| ResponseError::InvalidObservation { index, source })?;
-            let temperature =
-                aequitas::systems::si::quantities::ThermodynamicTemperature::from_base(absolute);
-            let denominator: MolarEnergy<T> = self.gas_constant * temperature;
-            let normalized: Dimensionless<T> = self.activation_energy / denominator;
-            let rate = self.frequency_factor * (-normalized.into_base()).exp();
-            let increment: Dimensionless<T> = rate * history.step();
-            accumulated += increment.into_base();
+            accumulated += self.increment_validated(temperature, step)?.get();
             if !accumulated.is_finite() {
                 return Err(ResponseError::NonFiniteResult {
                     kind: ValueKind::DamageIntegral,
@@ -139,6 +187,28 @@ impl<T: RealField> ArrheniusDamage<T> {
             sink.write(index, damage);
         }
         DamageIntegral::new(accumulated).map_err(ResponseError::from)
+    }
+
+    fn rate_validated(&self, temperature: ThermodynamicTemperature<T>) -> ReciprocalTime<T> {
+        let denominator: MolarEnergy<T> = self.gas_constant * temperature;
+        let normalized: Dimensionless<T> = self.activation_energy / denominator;
+        self.frequency_factor * (-normalized.into_base()).exp()
+    }
+
+    fn increment_validated(
+        &self,
+        temperature: ThermodynamicTemperature<T>,
+        step: Time<T>,
+    ) -> Result<DamageIntegral<T>, ResponseError<T>> {
+        let increment: Dimensionless<T> = self.rate_validated(temperature) * step;
+        let increment = increment.into_base();
+        if !increment.is_finite() {
+            return Err(ResponseError::NonFiniteResult {
+                kind: ValueKind::DamageIntegral,
+                value: increment,
+            });
+        }
+        DamageIntegral::new(increment).map_err(ResponseError::from)
     }
 }
 

@@ -6,4 +6,4 @@ mod history;
 
 pub use arrhenius::ArrheniusDamage;
 pub use cem::Cem43;
-pub use history::TemperatureHistory;
+pub use history::{TemperatureHistory, TemperatureSamples, UniformTemperatureObservation};

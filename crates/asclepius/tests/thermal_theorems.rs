@@ -6,7 +6,7 @@ use aequitas::systems::si::{
 };
 use asclepius::{
     BiologicalResponse, DamageIntegral, EquivalentExposure,
-    response::thermal::{ArrheniusDamage, Cem43, TemperatureHistory},
+    response::thermal::{ArrheniusDamage, Cem43, TemperatureHistory, TemperatureSamples},
 };
 
 fn kelvin(value: f64) -> ThermodynamicTemperature {
@@ -69,8 +69,102 @@ fn survival_and_kill_are_complements() {
 }
 
 #[test]
+fn lazy_temperature_stream_matches_borrowed_history() {
+    const KELVIN_OFFSET: f64 = 273.15;
+    let celsius = [43.0_f64, 44.0, 42.0];
+    let absolute = celsius.map(|value| kelvin(value + KELVIN_OFFSET));
+    let step = Time::from_unit::<Second>(60.0);
+
+    let borrowed = TemperatureHistory::new(&absolute, step).expect("valid borrowed history");
+    let streamed = TemperatureSamples::new(
+        celsius
+            .iter()
+            .copied()
+            .map(|value| kelvin(value + KELVIN_OFFSET)),
+        step,
+    )
+    .expect("valid streamed history");
+    let law = Cem43::<f64>::canonical();
+    let expected = law.evaluate(borrowed).expect("valid borrowed history");
+    let actual = law
+        .evaluate_uniform(streamed)
+        .expect("valid streamed history");
+    assert_eq!(
+        actual.get().into_base().to_bits(),
+        expected.get().into_base().to_bits()
+    );
+
+    let arrhenius = ArrheniusDamage::new(
+        ReciprocalTime::from_unit::<PerSecond>(2.0),
+        MolarEnergy::from_unit::<JoulePerMole>(1.0),
+        MolarHeatCapacity::from_unit::<JoulePerMoleKelvin>(1.0),
+    )
+    .expect("positive parameters");
+    let borrowed = TemperatureHistory::new(&absolute, step).expect("valid borrowed history");
+    let streamed = TemperatureSamples::new(absolute.into_iter(), step).expect("valid stream");
+    assert_eq!(
+        arrhenius
+            .evaluate_uniform(streamed)
+            .expect("valid streamed history")
+            .get()
+            .to_bits(),
+        arrhenius
+            .evaluate(borrowed)
+            .expect("valid borrowed history")
+            .get()
+            .to_bits()
+    );
+}
+
+#[test]
+fn single_increment_matches_singleton_history() {
+    let temperature = kelvin(316.15);
+    let step = Time::from_unit::<Second>(60.0);
+    let history = [temperature];
+    let cem = Cem43::<f64>::canonical();
+    assert_eq!(
+        cem.increment(temperature, step)
+            .expect("valid increment")
+            .get()
+            .into_base()
+            .to_bits(),
+        cem.evaluate(TemperatureHistory::new(&history, step).expect("valid singleton history"))
+            .expect("valid singleton history")
+            .get()
+            .into_base()
+            .to_bits()
+    );
+
+    let arrhenius = ArrheniusDamage::new(
+        ReciprocalTime::from_unit::<PerSecond>(2.0),
+        MolarEnergy::from_unit::<JoulePerMole>(1.0),
+        MolarHeatCapacity::from_unit::<JoulePerMoleKelvin>(1.0),
+    )
+    .expect("positive parameters");
+    assert_eq!(
+        arrhenius
+            .increment(temperature, step)
+            .expect("valid increment")
+            .get()
+            .to_bits(),
+        arrhenius
+            .evaluate(TemperatureHistory::new(&history, step).expect("valid singleton history"))
+            .expect("valid singleton history")
+            .get()
+            .to_bits()
+    );
+}
+
+#[test]
 fn thermal_laws_reject_invalid_boundaries() {
     assert!(TemperatureHistory::new(&[], Time::from_base(0.0_f64)).is_err());
+    assert!(
+        TemperatureSamples::new(
+            core::iter::empty::<ThermodynamicTemperature<f64>>(),
+            Time::from_base(0.0),
+        )
+        .is_err()
+    );
     assert!(
         ArrheniusDamage::new(
             ReciprocalTime::from_base(0.0_f64),
@@ -83,4 +177,28 @@ fn thermal_laws_reject_invalid_boundaries() {
     let invalid = [ThermodynamicTemperature::from_base(f64::NAN)];
     let history = TemperatureHistory::new(&invalid, Time::from_base(1.0)).expect("valid step");
     assert!(Cem43::canonical().evaluate(history).is_err());
+
+    let empty = TemperatureSamples::new(
+        core::iter::empty::<ThermodynamicTemperature<f64>>(),
+        Time::from_base(1.0),
+    )
+    .expect("valid step");
+    assert_eq!(
+        Cem43::canonical().evaluate_uniform(empty),
+        Err(asclepius::ResponseError::EmptyObservation)
+    );
+
+    let one = TemperatureSamples::new(
+        core::iter::once(ThermodynamicTemperature::from_base(316.15_f64)),
+        Time::from_base(1.0),
+    )
+    .expect("valid observation");
+    let mut no_output = [];
+    assert_eq!(
+        Cem43::canonical().cumulative_into(one, &mut no_output),
+        Err(asclepius::ResponseError::OutputLength {
+            expected: 1,
+            actual: 0,
+        })
+    );
 }
