@@ -16,7 +16,18 @@ fn kelvin(value: f64) -> ThermodynamicTemperature {
 #[test]
 fn canonical_cem_reference_cases_are_exact() {
     let law = Cem43::<f64>::canonical();
-    for (temperature, expected_seconds) in [(316.15, 60.0), (317.15, 120.0), (315.15, 15.0)] {
+    for (temperature, expected_rate, expected_seconds) in [
+        (316.15, 1.0, 60.0),
+        (317.15, 2.0, 120.0),
+        (315.15, 0.25, 15.0),
+    ] {
+        let actual_rate = law
+            .rate(kelvin(temperature))
+            .expect("valid temperature")
+            .into_base();
+        let rate_rounding = 16.0 * f64::EPSILON * expected_rate;
+        assert!((actual_rate - expected_rate).abs() <= rate_rounding);
+
         let samples = [kelvin(temperature)];
         let history =
             TemperatureHistory::new(&samples, Time::from_unit::<Second>(60.0)).expect("valid step");
@@ -177,6 +188,11 @@ fn thermal_laws_reject_invalid_boundaries() {
     let invalid = [ThermodynamicTemperature::from_base(f64::NAN)];
     let history = TemperatureHistory::new(&invalid, Time::from_base(1.0)).expect("valid step");
     assert!(Cem43::canonical().evaluate(history).is_err());
+    assert!(
+        Cem43::canonical()
+            .rate(ThermodynamicTemperature::from_base(f64::NAN))
+            .is_err()
+    );
 
     let empty = TemperatureSamples::new(
         core::iter::empty::<ThermodynamicTemperature<f64>>(),

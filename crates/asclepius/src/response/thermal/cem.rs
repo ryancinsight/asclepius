@@ -72,6 +72,36 @@ impl<T: RealField> Cem43<T> {
         self.reference
     }
 
+    /// Evaluate the instantaneous equivalent-exposure rate.
+    ///
+    /// The result is the ratio of equivalent exposure to elapsed time. It is
+    /// one at the reference temperature, doubles for every degree above the
+    /// canonical reference, and quarters for every degree below it.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`ResponseError`] when `temperature` is outside the finite
+    /// positive domain or the rate is non-finite.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use aequitas::systems::si::quantities::ThermodynamicTemperature;
+    /// use asclepius::response::thermal::Cem43;
+    ///
+    /// let rate = Cem43::canonical()
+    ///     .rate(ThermodynamicTemperature::from_base(317.15_f64))
+    ///     .expect("valid temperature");
+    /// assert_eq!(rate.into_base(), 2.0);
+    /// ```
+    pub fn rate(
+        &self,
+        temperature: ThermodynamicTemperature<T>,
+    ) -> Result<Dimensionless<T>, ResponseError<T>> {
+        validation::positive(ValueKind::Temperature, *temperature.as_base())?;
+        self.rate_validated(temperature)
+    }
+
     /// Evaluate one uniform-step exposure increment.
     ///
     /// # Errors
@@ -183,14 +213,7 @@ impl<T: RealField> Cem43<T> {
         temperature: ThermodynamicTemperature<T>,
         step: Time<T>,
     ) -> Result<EquivalentExposure<T>, ResponseError<T>> {
-        let inverse_kelvin = ReciprocalTemperature::from_base(<T as NumericElement>::ONE);
-        let factor = if temperature >= self.reference {
-            self.at_or_above.get()
-        } else {
-            self.below.get()
-        };
-        let exponent: Dimensionless<T> = inverse_kelvin * (self.reference - temperature);
-        let increment = step * factor.powf(exponent.into_base());
+        let increment = step * self.rate_validated(temperature)?;
         if !increment.as_base().is_finite() {
             return Err(ResponseError::NonFiniteResult {
                 kind: ValueKind::EquivalentExposure,
@@ -198,6 +221,27 @@ impl<T: RealField> Cem43<T> {
             });
         }
         EquivalentExposure::new(increment).map_err(ResponseError::from)
+    }
+
+    fn rate_validated(
+        &self,
+        temperature: ThermodynamicTemperature<T>,
+    ) -> Result<Dimensionless<T>, ResponseError<T>> {
+        let inverse_kelvin = ReciprocalTemperature::from_base(<T as NumericElement>::ONE);
+        let factor = if temperature >= self.reference {
+            self.at_or_above.get()
+        } else {
+            self.below.get()
+        };
+        let exponent: Dimensionless<T> = inverse_kelvin * (self.reference - temperature);
+        let rate = Dimensionless::from_base(factor.powf(exponent.into_base()));
+        if !rate.as_base().is_finite() {
+            return Err(ResponseError::NonFiniteResult {
+                kind: ValueKind::EquivalentExposure,
+                value: *rate.as_base(),
+            });
+        }
+        Ok(rate)
     }
 }
 

@@ -8,8 +8,9 @@ All externally observable changes are recorded here.
 
 - Add an allocation-free uniform-temperature observation seam. Borrowed
   `TemperatureHistory` and exact-size `TemperatureSamples<I, T>` streams feed
-  one monomorphized CEM43/Arrhenius kernel, while public single-step increments
-  let spatial solvers reuse the same laws without constructing histories.
+  one monomorphized CEM43/Arrhenius kernel, while public CEM43 rate and
+  single-step increment methods let spatial solvers reuse the same law without
+  constructing histories.
 
 - Typed, allocation-free generalized equivalent uniform dose, logistic tumour
   control probability, and Lyman normal-tissue complication probability.

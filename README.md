@@ -101,9 +101,9 @@ output/error types. Models monomorphize over `T: eunomia::RealField`; there is
 no vtable, scalar widening, unit metadata, or hidden allocation.
 `UniformTemperatureObservation<T>` seals the two supported observation shapes:
 borrowed `TemperatureHistory` and generic `TemperatureSamples<I, T>`.
-The iterator stays inline and monomorphizes into the same integration kernel;
-single-step CEM43 and Arrhenius methods reuse the identical increment law for
-spatial solvers.
+The iterator stays inline and monomorphizes into the same integration kernel.
+The validated CEM43 rate and single-step CEM43 and Arrhenius methods reuse the
+identical increment laws for spatial solvers.
 
 `asclepius-coeus` depends outward on Coeus while core remains independent. Its
 gEUD operation is monomorphized over the Coeus backend, validates borrowed
