@@ -20,8 +20,10 @@ Asclepius owns:
 
 Asclepius does not own dose-volume histograms, medical images, voxel grids,
 segmentation, material properties, transport solvers, optimization objectives,
-autodiff tapes, persistence, or device execution. Those remain with Helios,
-Kwavers, RITK, Proteus, Coeus, Consus, and Hephaestus.
+autodiff engines, persistence, or device execution. Those remain with Helios,
+Kwavers, RITK, Proteus, Coeus, Consus, and Hephaestus. The sibling
+`asclepius-coeus` crate translates Asclepius laws into Coeus graph operations;
+it does not move the engine or planning objectives into the law core.
 
 ## Example
 
@@ -60,28 +62,34 @@ while runtime-defined tissues own.
 ## Architecture
 
 ```text
-crates/asclepius/src/
-├── contract/
-│   └── response.rs             # GAT borrowed-observation seam
-├── response/
-│   ├── radiation/
-│   │   ├── equivalent_uniform_dose.rs
-│   │   ├── logistic_control.rs
-│   │   └── normal_complication.rs
-│   ├── thermal/
-│   │   ├── history.rs
-│   │   ├── arrhenius.rs
-│   │   └── cem.rs
-│   └── composition/
-│       └── independent.rs      # const-generic ZST strategy
-├── tissue/
-│   └── model.rs                # Cow identity plus static model
-└── value/
-    ├── probability.rs
-    ├── damage.rs
-    ├── exposure.rs
-    ├── parameter.rs
-    └── error.rs
+crates/
+├── asclepius/src/
+│   ├── contract/
+│   │   └── response.rs             # GAT borrowed-observation seam
+│   ├── response/
+│   │   ├── radiation/
+│   │   │   ├── equivalent_uniform_dose.rs
+│   │   │   ├── logistic_control.rs
+│   │   │   └── normal_complication.rs
+│   │   ├── thermal/
+│   │   │   ├── history.rs
+│   │   │   ├── arrhenius.rs
+│   │   │   └── cem.rs
+│   │   └── composition/
+│   │       └── independent.rs      # const-generic ZST strategy
+│   ├── tissue/
+│   │   └── model.rs                # Cow identity plus static model
+│   └── value/
+│       ├── probability.rs
+│       ├── damage.rs
+│       ├── exposure.rs
+│       ├── parameter.rs
+│       └── error.rs
+└── asclepius-coeus/src/
+    ├── response/radiation/
+    │   └── equivalent_uniform_dose.rs
+    └── value/
+        └── response_error.rs
 ```
 
 Every `lib.rs` and `mod.rs` is a manifest. Model families live in one canonical
@@ -89,6 +97,12 @@ leaf, dependencies point inward, and the core crate is `no_std + alloc`.
 `BiologicalResponse<T>` uses a GAT for borrowed observations and associated
 output/error types. Models monomorphize over `T: eunomia::RealField`; there is
 no vtable, scalar widening, unit metadata, or hidden allocation.
+
+`asclepius-coeus` depends outward on Coeus while core remains independent. Its
+gEUD operation is monomorphized over the Coeus backend, validates borrowed
+CPU-addressable dose storage without copying it, uses a detached normalization
+scale to reduce overflow, and preserves the exact analytical gradient because
+the normalized power mean is independent of every positive scale choice.
 
 ## Mathematical specification
 
@@ -146,7 +160,8 @@ TCP/NTCP midpoint and monotonicity, CEM43 reference cases, Arrhenius
 non-decreasing damage and survival identity, const-generic composition bounds,
 `f32`/`f64` instantiation, transparent layout, ZST routing, allocation-free
 borrowed evaluation, and differential comparison with the pre-extraction
-consumer formulas.
+consumer formulas. The Coeus adapter adds core-value, closed-form-gradient,
+large-finite-dose, invalid-domain, and Sequential/Moirai backend contracts.
 
 ## License
 

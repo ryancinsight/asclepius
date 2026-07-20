@@ -1,0 +1,26 @@
+[package]
+name = "asclepius-coeus"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+authors.workspace = true
+description = "Coeus autodiff integration for Asclepius biological-response laws"
+repository.workspace = true
+license.workspace = true
+readme = "../../README.md"
+keywords = ["autodiff", "biophysics", "radiobiology", "treatment-response"]
+categories = ["science"]
+publish = false
+
+[dependencies]
+asclepius = { version = "0.1.0", path = "../asclepius" }
+coeus-autograd = { version = "0.9.0", git = "https://github.com/ryancinsight/Coeus.git", rev = "85d1970a8bb5478e7dc7775ef1dade008977e063", default-features = false }
+coeus-core = { version = "0.9.0", git = "https://github.com/ryancinsight/Coeus.git", rev = "85d1970a8bb5478e7dc7775ef1dade008977e063" }
+coeus-ops = { version = "0.9.0", git = "https://github.com/ryancinsight/Coeus.git", rev = "85d1970a8bb5478e7dc7775ef1dade008977e063", default-features = false }
+coeus-tensor = { version = "0.9.0", git = "https://github.com/ryancinsight/Coeus.git", rev = "85d1970a8bb5478e7dc7775ef1dade008977e063" }
+
+[dev-dependencies]
+aequitas = { version = "0.1.0", git = "https://github.com/ryancinsight/aequitas", rev = "be3a1ac91286a17aecf18f0065d2aa6b385eb67b" }
+
+[lints]
+workspace = true

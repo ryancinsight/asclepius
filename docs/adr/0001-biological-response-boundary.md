@@ -43,6 +43,10 @@ Create the Asclepius workspace with a pure `asclepius` law crate.
 - Coeus tape construction belongs in a sibling infrastructure adapter, not in
   the `no_std` law crate. The adapter is a workspace-promotion trigger and may
   depend on Coeus; core never depends outward on autodiff infrastructure.
+- The adapter normalizes the gEUD tape by a detached positive dose scale.
+  Holding that scale constant preserves the derivative because
+  `s M_a(D/s) = M_a(D)` for every `s > 0`; it avoids a consumer-owned unstable
+  reconstruction without differentiating through a maximum/minimum selector.
 
 ## Theorems and proofs
 
@@ -116,11 +120,12 @@ any `p_j` is the non-negative product of the remaining survival factors.
 
 1. Add the Aequitas response dimensions and coherent units.
 2. Land the Asclepius laws with independent analytical and differential tests.
-3. Replace Helios scalar response functions and its Coeus gEUD tape expression
+3. Land the backend-generic Coeus adapter after making Coeus Git-consumable.
+4. Replace Helios scalar response functions and its Coeus gEUD tape expression
    with Asclepius-owned APIs; delete superseded code.
-4. Replace Kwavers CEM43, Arrhenius, and independent-insult arithmetic while
+5. Replace Kwavers CEM43, Arrhenius, and independent-insult arithmetic while
    retaining grids, therapy workflows, and tissue parameter catalogs.
-5. Register the repository in Atlas and run cross-package contract tests.
+6. Register the repository in Atlas and run cross-package contract tests.
 
 No forwarding wrappers, compatibility aliases, or fallback implementations
 remain after each consumer migration.
