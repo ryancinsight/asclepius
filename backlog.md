@@ -1,0 +1,9 @@
+# Asclepius backlog
+
+| ID | Outcome | Scope / non-goals | Acceptance oracle | Class | Status | Dependencies |
+| --- | --- | --- | --- | --- | --- | --- |
+| ASC-P1-001 | Establish the biological-response foundation. | Aequitas-typed gEUD, TCP, NTCP, CEM43, Arrhenius, independent insults, tissue identity; no imaging, grids, solvers, catalogs, or clinical parameter claims. | ADR proof obligations; analytical, property, differential, layout, allocation, docs, and full package gates. | minor, arch | review | Aequitas response quantities merged at `be3a1ac` |
+| ASC-P1-002 | Move the Coeus gEUD tape expression into an Asclepius adapter. | Autodiff expression only; Helios planning objectives remain Helios-owned. | Coeus value and finite-difference gradient differential tests; standalone consumable dependency graph. | minor, arch | blocked: Coeus remote packages inherit sibling `path` dependencies outside their repository; reopen when Coeus is independently consumable | ASC-P1-001 |
+| ASC-P1-003 | Migrate Helios and delete response duplicates. | `helios-analysis` response laws and Coeus gEUD expression; DVH storage and planning objectives remain local. | Helios analysis/planning/simulation focused gates and no residual duplicate formula. | minor, arch | todo | ASC-P1-001, ASC-P1-002 |
+| ASC-P1-004 | Migrate Kwavers and delete response duplicates. | CEM43, Arrhenius damage, independent insult composition; grids, workflows, and tissue catalogs remain local. | Kwavers physics/therapy/Python value-semantic gates and residue scan. | minor, arch | todo | ASC-P1-001 |
+| ASC-P1-005 | Register Asclepius in Atlas. | Gitlink, stack map, roadmap graduation, ADR, changelog; no unrelated package changes. | Remote-default OID proof and Atlas structural audit. | patch, arch | todo | ASC-P1-003, ASC-P1-004 |
