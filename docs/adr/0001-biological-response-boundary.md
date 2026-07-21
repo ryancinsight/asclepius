@@ -138,6 +138,14 @@ any `p_j` is the non-negative product of the remaining survival factors.
 No forwarding wrappers, compatibility aliases, or fallback implementations
 remain after each consumer migration.
 
+## Outcome
+
+The workspace is public at
+<https://github.com/ryancinsight/asclepius>. Helios `4ce96b1` and Kwavers
+`1cb01fe` consume reviewed Git revisions directly. Atlas `71cdc54` registers
+the provider, its dependency boundary, and its consumer edges. No consumer
+depends on a sibling-directory Asclepius patch.
+
 ## Verification
 
 - positive, negative, zero, NaN, infinity, and empty-observation boundaries;

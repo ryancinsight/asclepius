@@ -6,6 +6,9 @@ All externally observable changes are recorded here.
 
 ### Added
 
+- Publish Asclepius as a public Atlas provider. Helios and Kwavers now consume
+  reviewed Git revisions directly, without sibling-directory source patches.
+
 - Add an allocation-free uniform-temperature observation seam. Borrowed
   `TemperatureHistory` and exact-size `TemperatureSamples<I, T>` streams feed
   one monomorphized CEM43/Arrhenius kernel, while public CEM43 rate and

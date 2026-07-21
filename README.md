@@ -6,6 +6,13 @@ therapy and therapeutic-ultrasound consumers.
 
 The name refers to Asclepius, the Greek god of medicine and healing.
 
+## Distribution
+
+Asclepius is developed as a
+[public GitHub repository](https://github.com/ryancinsight/asclepius).
+Atlas consumers use reviewed Git revisions directly; no sibling-directory
+patch or private source is part of the consumer contract.
+
 ## Boundary
 
 Asclepius owns:
