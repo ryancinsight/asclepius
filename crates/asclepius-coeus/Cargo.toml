@@ -20,7 +20,7 @@ coeus-ops = { version = "0.9.0", git = "https://github.com/ryancinsight/Coeus.gi
 coeus-tensor = { version = "0.9.0", git = "https://github.com/ryancinsight/Coeus.git", rev = "85d1970a8bb5478e7dc7775ef1dade008977e063" }
 
 [dev-dependencies]
-aequitas = { version = "0.1.0", git = "https://github.com/ryancinsight/aequitas", rev = "be3a1ac91286a17aecf18f0065d2aa6b385eb67b" }
+aequitas = { version = "0.1.0", git = "https://github.com/ryancinsight/aequitas", rev = "cf9b2c3debabf0c08a2769fa8246908ad7cf53da" }
 
 [lints]
 workspace = true
