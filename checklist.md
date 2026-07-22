@@ -16,3 +16,5 @@
       merged as `1cb01fe` after all first-party CI checks passed.
 - [x] Register the public repository and consumer implementation revisions in
       Atlas; the final parent pin sweep advances this PM-complete head.
+- [x] Consolidate Aequitas, Eunomia, and Coeus onto versioned Git source
+      identities; verify both packages and publish the consumer-compatible head.

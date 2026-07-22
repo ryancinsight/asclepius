@@ -4,6 +4,13 @@ All externally observable changes are recorded here.
 
 ## Unreleased
 
+### Changed
+
+- Consolidate Aequitas, Eunomia, and Coeus consumption onto their versioned
+  Git contracts. `Cargo.lock` remains the reproducible revision pin, while
+  consumers no longer instantiate revision-qualified provider identities in
+  parallel with the canonical source graph.
+
 ### Added
 
 - Publish Asclepius as a public Atlas provider. Helios and Kwavers now consume

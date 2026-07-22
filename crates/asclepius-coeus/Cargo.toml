@@ -14,13 +14,13 @@ publish = false
 
 [dependencies]
 asclepius = { version = "0.1.0", path = "../asclepius" }
-coeus-autograd = { version = "0.9.0", git = "https://github.com/ryancinsight/Coeus.git", rev = "85d1970a8bb5478e7dc7775ef1dade008977e063", default-features = false }
-coeus-core = { version = "0.9.0", git = "https://github.com/ryancinsight/Coeus.git", rev = "85d1970a8bb5478e7dc7775ef1dade008977e063" }
-coeus-ops = { version = "0.9.0", git = "https://github.com/ryancinsight/Coeus.git", rev = "85d1970a8bb5478e7dc7775ef1dade008977e063", default-features = false }
-coeus-tensor = { version = "0.9.0", git = "https://github.com/ryancinsight/Coeus.git", rev = "85d1970a8bb5478e7dc7775ef1dade008977e063" }
+coeus-autograd = { version = "0.9.0", git = "https://github.com/ryancinsight/Coeus.git", default-features = false }
+coeus-core = { version = "0.9.0", git = "https://github.com/ryancinsight/Coeus.git" }
+coeus-ops = { version = "0.9.0", git = "https://github.com/ryancinsight/Coeus.git", default-features = false }
+coeus-tensor = { version = "0.9.0", git = "https://github.com/ryancinsight/Coeus.git" }
 
 [dev-dependencies]
-aequitas = { version = "0.1.0", git = "https://github.com/ryancinsight/aequitas", rev = "cf9b2c3debabf0c08a2769fa8246908ad7cf53da" }
+aequitas = { version = "0.1.0", git = "https://github.com/ryancinsight/aequitas" }
 
 [lints]
 workspace = true
