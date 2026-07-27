@@ -33,3 +33,26 @@ overflow-checks = true
 debug = false
 strip = "symbols"
 overflow-checks = true
+
+# Coeus defense-in-depth (PATH-DEP-AUDIT-2 hygiene): asclepius currently
+# has zero coeus-* consumers in this root crate's `[workspace.dependencies]`
+# block (verified by ssot inventory 2026-07-26), but its workspace member
+# `crates/asclepius-coeus` declares direct
+# `coeus-{core,tensor} = { path = "../../../coeus/crates/coeus-{core,tensor}" }`
+# deps (the only atlas root with a `*-coeus` integration sub-crate other
+# than `coeus-hephaestus`). The overlay is added forward-defensively so
+# any future direct coeus-* git-source consumer -- including a future
+# crates.io release of `asclepius-coeus` that drags in
+# `coeus-{core,tensor}` via git+https -- is redirected to the local
+# working copy in `repos/coeus` regardless of gitlink state. Mirrors the
+# CFDrs/Cargo.toml, ritk/Cargo.toml, kwavers/Cargo.toml,
+# hephaestus/Cargo.toml pattern.
+# Scope: git+https URL redirection only -- does NOT auto-rewrite
+# currently-locked `Cargo.lock` entries; requires
+# `cargo update -p <name>` per consumer. The capital-C `Coeus.git`
+# parallel overlay (with FULL 6-crate subkey coverage matching the
+# asclepius *actual-resolved* Cargo.lock set) is provided IMMEDIATELY
+# BELOW this block; without all-6 subkeys there, cargo would still
+# clone from the capital-C URL for the 3 missing crates.
+
+# ATLAS-PATH-DEP-AUDIT-2 round-4 closure
