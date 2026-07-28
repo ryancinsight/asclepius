@@ -13,8 +13,8 @@ categories = ["no-std", "science"]
 publish = false
 
 [dependencies]
-aequitas = { version = "0.1.0", path = "../../../aequitas", default-features = false }
-eunomia = { version = "0.7.0", path = "../../../eunomia", default-features = false }
+aequitas = { version = "0.1.0", git = "https://github.com/ryancinsight/aequitas", rev = "f91bf0243ce69c89e912d4dc771b174eb54e68cd", default-features = false }
+eunomia = { version = "0.7.0", git = "https://github.com/ryancinsight/eunomia", rev = "992baf4dee309225bc3ac1edba2c4dd498afb80c", default-features = false }
 
 [dev-dependencies]
 proptest = "1.11.0"
