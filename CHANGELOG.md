@@ -6,6 +6,10 @@ All externally observable changes are recorded here.
 
 ### Changed
 
+- CEM43's canonical Kelvin conversion now carries an explicit Eunomia
+  `UnitScalar` bound, matching Aequitas' provider-owned quantity-conversion
+  contract without widening `RealField`'s public supertraits.
+
 - Consolidate Aequitas, Eunomia, and Coeus consumption onto their versioned
   Git contracts. `Cargo.lock` remains the reproducible revision pin, while
   consumers no longer instantiate revision-qualified provider identities in

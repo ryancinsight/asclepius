@@ -2,7 +2,7 @@ use aequitas::systems::si::{
     quantities::{Dimensionless, ReciprocalTemperature, ThermodynamicTemperature, Time},
     units::Kelvin,
 };
-use eunomia::{NumericElement, RealField};
+use eunomia::{NumericElement, RealField, UnitScalar};
 
 use crate::{
     BiologicalResponse,
@@ -37,7 +37,7 @@ pub struct Cem43<T> {
     below: CompensationFactor<T>,
 }
 
-impl<T: RealField> Cem43<T> {
+impl<T: RealField + UnitScalar> Cem43<T> {
     /// Construct a cumulative-equivalent-exposure law.
     ///
     /// # Errors
@@ -245,7 +245,7 @@ impl<T: RealField> Cem43<T> {
     }
 }
 
-impl<T: RealField> BiologicalResponse<T> for Cem43<T> {
+impl<T: RealField + UnitScalar> BiologicalResponse<T> for Cem43<T> {
     type Observation<'a>
         = TemperatureHistory<'a, T>
     where
