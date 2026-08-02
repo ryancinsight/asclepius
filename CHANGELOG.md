@@ -6,6 +6,10 @@ All externally observable changes are recorded here.
 
 ### Changed
 
+- Enable crates.io publication for the Asclepius law core and replace the
+  integration crate's sibling paths with versioned Git sources so standalone
+  checkouts resolve the complete workspace.
+
 - CEM43's canonical Kelvin conversion now carries an explicit Eunomia
   `UnitScalar` bound, matching Aequitas' provider-owned quantity-conversion
   contract without widening `RealField`'s public supertraits.
@@ -16,6 +20,9 @@ All externally observable changes are recorded here.
   parallel with the canonical source graph.
 
 ### Added
+
+- Add an environment-gated crates.io Trusted Publishing workflow with
+  package/version validation and short-lived OIDC credentials.
 
 - Publish Asclepius as a public Atlas provider. Helios and Kwavers now consume
   reviewed Git revisions directly, without sibling-directory source patches.

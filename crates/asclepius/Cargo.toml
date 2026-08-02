@@ -10,7 +10,7 @@ license.workspace = true
 readme = "../../README.md"
 keywords = ["biophysics", "radiobiology", "thermal-dose", "treatment-response"]
 categories = ["no-std", "science"]
-publish = false
+publish = true
 
 [dependencies]
 aequitas = { version = "0.1.0", git = "https://github.com/ryancinsight/aequitas", default-features = false }

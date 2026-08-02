@@ -35,7 +35,9 @@ where
     let tolerance = 64.0 * f64::EPSILON * oracle.as_base().abs();
     assert!((response.tensor.as_slice()[0] - oracle.as_base()).abs() <= tolerance);
 
-    sum(&response).backward();
+    sum(&response)
+        .backward()
+        .expect("fixture response supports reverse differentiation");
     let gradient = variable
         .grad()
         .expect("tracked dose variable receives a gradient");
