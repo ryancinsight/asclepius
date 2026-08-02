@@ -2,6 +2,9 @@
 
 ## Codex
 
+- [ ] Publish `asclepius` from a standalone exact-source archive, register its
+      Trusted Publisher, enforce trusted-publishing-only mode, and create the
+      matching GitHub Release.
 - [x] Audit current Helios and Kwavers response ownership.
 - [x] Verify primary mathematical sources and model limitations.
 - [x] Add the required Aequitas dimensional vocabulary.

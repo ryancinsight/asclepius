@@ -9,9 +9,16 @@ The name refers to Asclepius, the Greek god of medicine and healing.
 ## Distribution
 
 Asclepius is developed as a
-[public GitHub repository](https://github.com/ryancinsight/asclepius).
-Atlas consumers use reviewed Git revisions directly; no sibling-directory
-patch or private source is part of the consumer contract.
+[public GitHub repository](https://github.com/ryancinsight/asclepius) and
+published as the [`asclepius`](https://crates.io/crates/asclepius) crate.
+Atlas source consumers use reviewed Git revisions directly; no
+sibling-directory patch or private source is part of the consumer contract.
+
+The `Crates.io Release` workflow validates a named workspace package on manual
+dispatch. After the first release establishes the crate and its trusted
+publisher, a GitHub Release tagged `crate-<package>-v<version>` publishes the
+matching Cargo version through the protected `crates-io` environment with a
+short-lived OIDC token.
 
 ## Boundary
 
