@@ -1,0 +1,14 @@
+[book]
+title = "asclepius: Biological Response for Atlas"
+authors = ["Ryan Clanton"]
+src = "."
+language = "en"
+[build]
+build-dir = "../../target/book/asclepius"
+create-missing = false
+[output.html]
+no-section-label = false
+mathjax-support = true
+site-url = "/asclepius/"
+git-repository-url = "https://github.com/ryancinsight/asclepius"
+default-theme = "rust"
