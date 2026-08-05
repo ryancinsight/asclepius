@@ -14,7 +14,7 @@ publish = true
 
 [dependencies]
 aequitas = { version = "0.1.0", git = "https://github.com/ryancinsight/aequitas", default-features = false }
-eunomia = { version = "0.7.0", git = "https://github.com/ryancinsight/eunomia", default-features = false }
+eunomia = { version = "0.8.0", git = "https://github.com/ryancinsight/eunomia", default-features = false }
 
 [dev-dependencies]
 proptest = "1.11.0"
