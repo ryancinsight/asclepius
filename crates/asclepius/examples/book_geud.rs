@@ -6,8 +6,8 @@
 //! For uniform dose distributions gEUD equals the dose regardless of `a`.
 
 use aequitas::systems::si::quantities::AbsorbedDose;
-use asclepius::{BiologicalResponse, VolumeEffect};
 use asclepius::response::radiation::GeneralizedEquivalentUniformDose;
+use asclepius::{BiologicalResponse, VolumeEffect};
 
 fn main() {
     // ── Uniform dose: gEUD equals the dose for any exponent ──
@@ -17,7 +17,9 @@ fn main() {
     for &a in &[1.0_f64, 5.0, -5.0, 0.1] {
         let vol_effect = VolumeEffect::new(a).expect("valid exponent");
         let geud = GeneralizedEquivalentUniformDose::new(vol_effect);
-        let result = geud.evaluate(doses_uniform.as_slice()).expect("valid doses");
+        let result = geud
+            .evaluate(doses_uniform.as_slice())
+            .expect("valid doses");
         let geud_gy = *result.as_base();
         assert!(
             (geud_gy - 2.0).abs() < 1e-10,
@@ -37,7 +39,10 @@ fn main() {
         .expect("valid");
     let geud_mean_gy = *geud_mean.as_base();
     println!("mixed doses [1,2,3,4] Gy: gEUD(a=1) = {geud_mean_gy:.4} Gy (mean = 2.5)");
-    assert!((geud_mean_gy - 2.5).abs() < 1e-10, "gEUD(a=1) must equal mean dose");
+    assert!(
+        (geud_mean_gy - 2.5).abs() < 1e-10,
+        "gEUD(a=1) must equal mean dose"
+    );
 
     // For large positive a, gEUD approaches max(D) = 4 Gy.
     let a_large = VolumeEffect::new(20.0_f64).expect("large a");
@@ -46,7 +51,10 @@ fn main() {
         .expect("valid");
     let geud_serial_gy = *geud_serial.as_base();
     println!("mixed doses [1,2,3,4] Gy: gEUD(a=20) = {geud_serial_gy:.4} Gy (→ 4.0)");
-    assert!(geud_serial_gy >= geud_mean_gy, "gEUD(large a) must exceed gEUD(a=1)");
+    assert!(
+        geud_serial_gy >= geud_mean_gy,
+        "gEUD(large a) must exceed gEUD(a=1)"
+    );
 
     println!("all gEUD assertions passed");
 }
