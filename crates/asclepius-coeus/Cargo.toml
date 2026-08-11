@@ -14,10 +14,10 @@ publish = false
 
 [dependencies]
 asclepius = { version = "0.1.0", path = "../asclepius" }
-coeus-autograd = { version = "0.9.0", git = "https://github.com/ryancinsight/Coeus.git", default-features = false }
-coeus-core = { version = "0.9.0", git = "https://github.com/ryancinsight/Coeus.git" }
-coeus-ops = { version = "0.9.0", git = "https://github.com/ryancinsight/Coeus.git", default-features = false }
-coeus-tensor = { version = "0.9.0", git = "https://github.com/ryancinsight/Coeus.git" }
+coeus-autograd = { version = "0.10.0", git = "https://github.com/ryancinsight/Coeus.git", default-features = false }
+coeus-core = { version = "0.10.0", git = "https://github.com/ryancinsight/Coeus.git" }
+coeus-ops = { version = "0.10.0", git = "https://github.com/ryancinsight/Coeus.git", default-features = false }
+coeus-tensor = { version = "0.10.0", git = "https://github.com/ryancinsight/Coeus.git" }
 
 [dev-dependencies]
 aequitas = { version = "0.2.0", git = "https://github.com/ryancinsight/aequitas" }
