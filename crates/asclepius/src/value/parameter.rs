@@ -24,22 +24,44 @@ impl<T: RealField> VolumeEffect<T> {
     }
 }
 
-/// Validated finite positive dose-response slope.
+/// Validated finite positive Niemierko `gamma50` parameter.
 #[derive(Clone, Copy, Debug, PartialEq, PartialOrd)]
 #[repr(transparent)]
-pub struct ResponseSlope<T>(T);
+pub struct Gamma50<T>(T);
 
-impl<T: RealField> ResponseSlope<T> {
-    /// Validate a response slope.
+impl<T: RealField> Gamma50<T> {
+    /// Validate a Niemierko `gamma50` parameter.
     ///
     /// # Errors
     ///
     /// Returns [`InvalidValue`] when `value` is not finite and positive.
     pub fn new(value: T) -> Result<Self, InvalidValue<T>> {
-        validation::positive(ValueKind::ResponseSlope, value).map(Self)
+        validation::positive(ValueKind::Gamma50, value).map(Self)
     }
 
-    /// Return the slope.
+    /// Return `gamma50`.
+    #[must_use]
+    pub const fn get(self) -> T {
+        self.0
+    }
+}
+
+/// Validated finite positive Lyman normalized slope `m` parameter.
+#[derive(Clone, Copy, Debug, PartialEq, PartialOrd)]
+#[repr(transparent)]
+pub struct LymanSlope<T>(T);
+
+impl<T: RealField> LymanSlope<T> {
+    /// Validate a Lyman normalized slope `m` parameter.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`InvalidValue`] when `value` is not finite and positive.
+    pub fn new(value: T) -> Result<Self, InvalidValue<T>> {
+        validation::positive(ValueKind::LymanSlope, value).map(Self)
+    }
+
+    /// Return the normalized slope `m`.
     #[must_use]
     pub const fn get(self) -> T {
         self.0

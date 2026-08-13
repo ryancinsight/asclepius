@@ -2,7 +2,7 @@
 
 use aequitas::systems::si::quantities::AbsorbedDose;
 use asclepius::{
-    BiologicalResponse, ResponseSlope, VolumeEffect,
+    BiologicalResponse, Gamma50, LymanSlope, VolumeEffect,
     response::radiation::{
         GeneralizedEquivalentUniformDose, LogisticControlProbability, LymanComplicationProbability,
     },
@@ -51,9 +51,10 @@ fn assert_radiation_laws<T: RealField>() {
     assert!(*low.as_base() < *high.as_base());
 
     let midpoint = dose::<T>(50.0);
-    let slope = ResponseSlope::new(T::from_f64(0.2)).expect("positive slope");
-    let tcp = LogisticControlProbability::new(midpoint, slope).expect("positive midpoint");
-    let ntcp = LymanComplicationProbability::new(midpoint, slope).expect("positive midpoint");
+    let gamma50 = Gamma50::new(T::from_f64(0.2)).expect("positive gamma50");
+    let m = LymanSlope::new(T::from_f64(0.2)).expect("positive Lyman slope");
+    let tcp = LogisticControlProbability::new(midpoint, gamma50).expect("positive midpoint");
+    let ntcp = LymanComplicationProbability::new(midpoint, m).expect("positive midpoint");
     assert_close(tcp.evaluate(midpoint).expect("valid dose").get(), 0.5, 8.0);
     assert_close(ntcp.evaluate(midpoint).expect("valid dose").get(), 0.5, 8.0);
     assert!(

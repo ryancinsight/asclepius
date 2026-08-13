@@ -7,7 +7,7 @@ use aequitas::systems::si::{
     units::Second,
 };
 use asclepius::{
-    BiologicalResponse, DamageIntegral, EquivalentExposure, Probability, ResponseSlope, Tissue,
+    BiologicalResponse, DamageIntegral, EquivalentExposure, Gamma50, Probability, Tissue,
     response::{
         composition::IndependentInsults,
         radiation::LogisticControlProbability,
@@ -57,7 +57,7 @@ fn wrappers_are_transparent_and_strategies_are_zero_sized() {
 fn borrowed_tissue_evaluation_is_allocation_free() {
     let model = LogisticControlProbability::new(
         AbsorbedDose::from_base(50.0_f64),
-        ResponseSlope::new(0.2).expect("positive slope"),
+        Gamma50::new(0.2).expect("positive gamma50"),
     )
     .expect("positive midpoint");
 

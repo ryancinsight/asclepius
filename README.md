@@ -47,7 +47,7 @@ use aequitas::systems::si::{
     units::Gray,
 };
 use asclepius::{
-    BiologicalResponse, ResponseSlope, VolumeEffect,
+    BiologicalResponse, Gamma50, VolumeEffect,
     response::radiation::{
         GeneralizedEquivalentUniformDose, LogisticControlProbability,
     },
@@ -61,7 +61,7 @@ let geud = geud_model.evaluate(&doses).expect("valid dose sample");
 
 let tcp_model = LogisticControlProbability::new(
     AbsorbedDose::from_unit::<Gray>(50.0),
-    ResponseSlope::new(2.0).expect("positive slope"),
+    Gamma50::new(2.0).expect("positive gamma50"),
 )
 .expect("positive midpoint dose");
 let tcp = tcp_model.evaluate(geud).expect("valid equivalent dose");

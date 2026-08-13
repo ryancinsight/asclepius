@@ -3,7 +3,7 @@ use eunomia::{NumericElement, RealField};
 
 use crate::{
     BiologicalResponse,
-    value::{InvalidValue, Probability, ResponseError, ResponseSlope},
+    value::{Gamma50, InvalidValue, Probability, ResponseError},
 };
 
 use super::validation;
@@ -21,7 +21,7 @@ use super::validation;
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub struct LogisticControlProbability<T> {
     midpoint: AbsorbedDose<T>,
-    slope: ResponseSlope<T>,
+    gamma50: Gamma50<T>,
 }
 
 impl<T: RealField> LogisticControlProbability<T> {
@@ -30,12 +30,20 @@ impl<T: RealField> LogisticControlProbability<T> {
     /// # Errors
     ///
     /// Returns [`InvalidValue`] when `midpoint` is not finite and positive.
-    pub fn new(
-        midpoint: AbsorbedDose<T>,
-        slope: ResponseSlope<T>,
-    ) -> Result<Self, InvalidValue<T>> {
+    ///
+    /// ```compile_fail
+    /// # use aequitas::systems::si::{quantities::AbsorbedDose, units::Gray};
+    /// # use asclepius::{Gamma50, LymanSlope};
+    /// # use asclepius::response::radiation::LogisticControlProbability;
+    /// let m = LymanSlope::new(0.2_f64).expect("positive Lyman slope");
+    /// let _ = LogisticControlProbability::new(
+    ///     AbsorbedDose::from_unit::<Gray>(50.0),
+    ///     m,
+    /// );
+    /// ```
+    pub fn new(midpoint: AbsorbedDose<T>, gamma50: Gamma50<T>) -> Result<Self, InvalidValue<T>> {
         validation::positive_dose(midpoint)?;
-        Ok(Self { midpoint, slope })
+        Ok(Self { midpoint, gamma50 })
     }
 
     /// Return the 50% control dose.
@@ -44,10 +52,10 @@ impl<T: RealField> LogisticControlProbability<T> {
         self.midpoint
     }
 
-    /// Return the normalized response slope.
+    /// Return the Niemierko `gamma50` parameter.
     #[must_use]
-    pub const fn slope(&self) -> ResponseSlope<T> {
-        self.slope
+    pub const fn gamma50(&self) -> Gamma50<T> {
+        self.gamma50
     }
 }
 
@@ -70,7 +78,7 @@ impl<T: RealField> BiologicalResponse<T> for LogisticControlProbability<T> {
         let dose = validation::non_negative_dose(observation)?;
         let one = <T as NumericElement>::ONE;
         let four = T::from_f64(4.0);
-        let ratio = (*self.midpoint.as_base() / dose).powf(four * self.slope.get());
+        let ratio = (*self.midpoint.as_base() / dose).powf(four * self.gamma50.get());
         Probability::new((one + ratio).recip()).map_err(ResponseError::from)
     }
 }
