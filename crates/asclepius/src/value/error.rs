@@ -12,8 +12,10 @@ pub enum ValueKind {
     DamageIntegral,
     /// Generalized-mean volume-effect exponent.
     VolumeEffect,
-    /// Positive outcome-response slope.
-    ResponseSlope,
+    /// Positive Niemierko `gamma50` parameter.
+    Gamma50,
+    /// Positive Lyman normalized slope `m` parameter.
+    LymanSlope,
     /// CEM temperature-compensation factor.
     CompensationFactor,
     /// Arrhenius frequency factor.

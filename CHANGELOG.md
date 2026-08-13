@@ -6,6 +6,11 @@ All externally observable changes are recorded here.
 
 ### Changed
 
+- Separate the Niemierko `Gamma50<T>` and Lyman `LymanSlope<T>` parameters;
+  the former `ResponseSlope<T>` surface could silently interchange distinct
+  model quantities, so all in-repository callers now use the domain-specific
+  types.
+
 - Enable crates.io publication for the Asclepius law core and replace the
   integration crate's sibling paths with versioned Git sources so standalone
   checkouts resolve the complete workspace.

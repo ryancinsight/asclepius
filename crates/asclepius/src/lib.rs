@@ -18,6 +18,6 @@ pub mod value;
 pub use contract::BiologicalResponse;
 pub use tissue::Tissue;
 pub use value::{
-    CompensationFactor, DamageIntegral, EquivalentExposure, InvalidValue, Probability,
-    ResponseError, ResponseSlope, ValueConstraint, ValueKind, VolumeEffect,
+    CompensationFactor, DamageIntegral, EquivalentExposure, Gamma50, InvalidValue, LymanSlope,
+    Probability, ResponseError, ValueConstraint, ValueKind, VolumeEffect,
 };

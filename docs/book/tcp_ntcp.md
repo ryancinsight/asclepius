@@ -2,9 +2,10 @@
 
 Asclepius owns the two classic radiation-response probability laws over
 validated parameters: the Niemierko logistic tumour-control probability and
-the Lyman normal-tissue complication probability. Both take the same shape —
-a validated midpoint dose and a normalized response slope — and both implement
-the statically dispatched `BiologicalResponse<T>` contract with the borrowed
+the Lyman normal-tissue complication probability. Both take a validated
+midpoint dose, but their distinct `Gamma50` and `LymanSlope` types preserve the
+difference between Niemierko `gamma50` and Lyman `m`. Both implement the
+statically dispatched `BiologicalResponse<T>` contract with the borrowed
 observation family `AbsorbedDose<T>`.
 
 ## Logistic tumour-control probability
@@ -26,11 +27,11 @@ The following is a focused, non-standalone API fragment:
 ```rust,ignore
 use aequitas::systems::si::{quantities::AbsorbedDose, units::Gray};
 use asclepius::response::radiation::LogisticControlProbability;
-use asclepius::{BiologicalResponse, ResponseSlope};
+use asclepius::{BiologicalResponse, Gamma50};
 
 let tcp = LogisticControlProbability::new(
     AbsorbedDose::from_unit::<Gray>(50.0),
-    ResponseSlope::new(2.0)?,
+    Gamma50::new(2.0)?,
 )?
 .evaluate(AbsorbedDose::from_unit::<Gray>(60.0))?;
 assert!(tcp.get() > 0.5); // above the midpoint dose
@@ -54,11 +55,11 @@ range proves `0 <= NTCP <= 1`.
 ```rust,ignore
 use aequitas::systems::si::{quantities::AbsorbedDose, units::Gray};
 use asclepius::response::radiation::LymanComplicationProbability;
-use asclepius::{BiologicalResponse, ResponseSlope};
+use asclepius::{BiologicalResponse, LymanSlope};
 
 let ntcp = LymanComplicationProbability::new(
     AbsorbedDose::from_unit::<Gray>(45.0),
-    ResponseSlope::new(0.15)?,
+    LymanSlope::new(0.15)?,
 )?
 .evaluate(AbsorbedDose::from_unit::<Gray>(40.0))?;
 assert!(ntcp.get() < 0.5); // below the midpoint dose
@@ -67,8 +68,9 @@ assert!(ntcp.get() < 0.5); // below the midpoint dose
 ## Composition
 
 Both laws share the validation surface: the midpoint must be finite and
-positive (`ResponseSlope` likewise), and each evaluated dose is revalidated as
-finite and non-negative. Composing a reduction (such as gEUD) with a control
+positive; `Gamma50` and `LymanSlope` each validate their own positive
+parameter, and each evaluated dose is revalidated as finite and non-negative.
+Composing a reduction (such as gEUD) with a control
 law is a plain typed pipeline — the `treatment_response` example evaluates
 `gEUD` over a dose sample and feeds the equivalent dose straight into
 `LogisticControlProbability`, and the `IndependentInsults` strategy composes

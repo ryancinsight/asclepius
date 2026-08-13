@@ -3,7 +3,7 @@ use eunomia::RealField;
 
 use crate::{
     BiologicalResponse,
-    value::{InvalidValue, Probability, ResponseError, ResponseSlope},
+    value::{InvalidValue, LymanSlope, Probability, ResponseError},
 };
 
 use super::validation;
@@ -21,7 +21,7 @@ use super::validation;
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub struct LymanComplicationProbability<T> {
     midpoint: AbsorbedDose<T>,
-    slope: ResponseSlope<T>,
+    m: LymanSlope<T>,
 }
 
 impl<T: RealField> LymanComplicationProbability<T> {
@@ -30,12 +30,9 @@ impl<T: RealField> LymanComplicationProbability<T> {
     /// # Errors
     ///
     /// Returns [`InvalidValue`] when `midpoint` is not finite and positive.
-    pub fn new(
-        midpoint: AbsorbedDose<T>,
-        slope: ResponseSlope<T>,
-    ) -> Result<Self, InvalidValue<T>> {
+    pub fn new(midpoint: AbsorbedDose<T>, m: LymanSlope<T>) -> Result<Self, InvalidValue<T>> {
         validation::positive_dose(midpoint)?;
-        Ok(Self { midpoint, slope })
+        Ok(Self { midpoint, m })
     }
 
     /// Return the 50% complication dose.
@@ -44,10 +41,10 @@ impl<T: RealField> LymanComplicationProbability<T> {
         self.midpoint
     }
 
-    /// Return the normalized response slope.
+    /// Return the Lyman normalized slope `m`.
     #[must_use]
-    pub const fn slope(&self) -> ResponseSlope<T> {
-        self.slope
+    pub const fn m(&self) -> LymanSlope<T> {
+        self.m
     }
 }
 
@@ -71,7 +68,7 @@ impl<T: RealField> BiologicalResponse<T> for LymanComplicationProbability<T> {
         let midpoint = *self.midpoint.as_base();
         let half = T::from_f64(0.5);
         let inverse_sqrt_two = T::from_f64(core::f64::consts::FRAC_1_SQRT_2);
-        let normalized = (dose - midpoint) / (self.slope.get() * midpoint);
+        let normalized = (dose - midpoint) / (self.m.get() * midpoint);
         Probability::new(half * (-normalized * inverse_sqrt_two).erfc())
             .map_err(ResponseError::from)
     }

@@ -5,7 +5,7 @@ use aequitas::systems::si::{
     units::{Gray, Kelvin, Second},
 };
 use asclepius::{
-    BiologicalResponse, ResponseSlope, VolumeEffect,
+    BiologicalResponse, Gamma50, VolumeEffect,
     response::{
         radiation::{GeneralizedEquivalentUniformDose, LogisticControlProbability},
         thermal::{Cem43, TemperatureHistory},
@@ -21,7 +21,7 @@ fn main() {
     .expect("invariant: fixture doses are finite and non-negative");
     let control = LogisticControlProbability::new(
         AbsorbedDose::from_unit::<Gray>(50.0),
-        ResponseSlope::new(2.0).expect("invariant: fixture slope is finite and positive"),
+        Gamma50::new(2.0).expect("invariant: fixture gamma50 is finite and positive"),
     )
     .expect("invariant: fixture midpoint is finite and positive")
     .evaluate(geud)

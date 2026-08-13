@@ -4,7 +4,7 @@
 //! computations can trust their inputs.  This example exercises the
 //! complete validation surface of the most-used value types.
 
-use asclepius::{InvalidValue, Probability, ResponseSlope, VolumeEffect};
+use asclepius::{Gamma50, InvalidValue, Probability, VolumeEffect};
 
 fn main() {
     // ── Probability: closed [0, 1] ──
@@ -52,14 +52,14 @@ fn main() {
     );
     println!("VolumeEffect validation: all checks pass");
 
-    // ── ResponseSlope: finite, positive ──
-    let gamma50 = ResponseSlope::<f64>::new(4.0).expect("valid slope");
+    // ── Gamma50: finite, positive ──
+    let gamma50 = Gamma50::<f64>::new(4.0).expect("valid gamma50");
     println!("γ₅₀ = {}", gamma50.get());
     assert!(
-        ResponseSlope::<f64>::new(-1.0).is_err(),
-        "negative slope rejected"
+        Gamma50::<f64>::new(-1.0).is_err(),
+        "negative gamma50 rejected"
     );
-    println!("ResponseSlope validation: all checks pass");
+    println!("Gamma50 validation: all checks pass");
 
     println!("all biological-value assertions passed");
 }

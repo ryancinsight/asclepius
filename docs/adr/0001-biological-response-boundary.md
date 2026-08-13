@@ -1,8 +1,10 @@
 # ADR 0001: Own shared biological response in Asclepius
 
 - Status: accepted
-- Change class: minor, architectural
+- Change class: major, architectural
 - Date: 2026-07-20
+- Revision: 2026-08-13 — split the semantically distinct radiation-response
+  parameters into domain-specific types and migrate all in-repository callers.
 
 ## Context
 
@@ -29,6 +31,9 @@ Create the Asclepius workspace with a pure `asclepius` law crate.
   time, thermodynamic temperature, and time dimensions.
 - Transparent validating newtypes own probabilities, damage integrals,
   equivalent exposure, and dimensionless response parameters.
+- `Gamma50<T>` is the Niemierko TCP parameter and `LymanSlope<T>` is the Lyman
+  normalized `m` parameter. They remain separate validating newtypes so a
+  parameter from one law cannot be passed to the other by type inference.
 - `BiologicalResponse<T>` uses a GAT for the borrowed observation family and
   associated output/error types.
 - Radiation and thermal laws are generic over `T: RealField` and statically
@@ -119,6 +124,9 @@ any `p_j` is the non-negative product of the remaining survival factors.
   caller-provided slices avoid allocation and copies.
 - Dynamic response traits: rejected because model types are known at operation
   boundaries and static dispatch preserves monomorphization.
+- One shared `ResponseSlope<T>` for TCP and NTCP: rejected because `gamma50`
+  and Lyman `m` have different domain roles even though both are positive
+  scalars; a shared wrapper permits silent parameter interchange.
 - Put Coeus in the core crate: rejected because infrastructure would leak into
   the mathematical domain and break `no_std` isolation.
 
