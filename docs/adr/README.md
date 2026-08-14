@@ -6,4 +6,4 @@
 
 | ADR | Title | Status |
 | --- | ----- | ------ |
-| [0001](0001-biological-response-boundary.md) | Own shared biological response in Asclepius | accepted |
+| [0001](0001-biological-response-boundary.md) | Own shared biological response in Asclepius | Accepted |
