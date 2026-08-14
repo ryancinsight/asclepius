@@ -31,9 +31,30 @@ impl<T: RealField> LogisticControlProbability<T> {
     ///
     /// Returns [`InvalidValue`] when `midpoint` is not finite and positive.
     ///
+    /// # Examples
+    ///
+    /// The Niemierko `gamma50` is the law's own parameter:
+    ///
+    /// ```
+    /// # use aequitas::systems::si::{quantities::AbsorbedDose, units::Gray};
+    /// # use asclepius::Gamma50;
+    /// # use asclepius::response::radiation::LogisticControlProbability;
+    /// let gamma50 = Gamma50::new(2.0_f64).expect("positive gamma50");
+    /// let law = LogisticControlProbability::new(
+    ///     AbsorbedDose::from_unit::<Gray>(50.0),
+    ///     gamma50,
+    /// )?;
+    /// assert_eq!(law.gamma50().get(), 2.0);
+    /// # Ok::<(), asclepius::InvalidValue<f64>>(())
+    /// ```
+    ///
+    /// A Lyman normalized slope `m` is a different quantity and does not
+    /// substitute for it. The call below differs from the one above only in
+    /// the type of the second argument, and does not compile:
+    ///
     /// ```compile_fail
     /// # use aequitas::systems::si::{quantities::AbsorbedDose, units::Gray};
-    /// # use asclepius::{Gamma50, LymanSlope};
+    /// # use asclepius::LymanSlope;
     /// # use asclepius::response::radiation::LogisticControlProbability;
     /// let m = LymanSlope::new(0.2_f64).expect("positive Lyman slope");
     /// let _ = LogisticControlProbability::new(

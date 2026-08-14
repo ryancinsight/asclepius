@@ -30,6 +30,38 @@ impl<T: RealField> LymanComplicationProbability<T> {
     /// # Errors
     ///
     /// Returns [`InvalidValue`] when `midpoint` is not finite and positive.
+    ///
+    /// # Examples
+    ///
+    /// The Lyman normalized slope `m` is the law's own parameter:
+    ///
+    /// ```
+    /// # use aequitas::systems::si::{quantities::AbsorbedDose, units::Gray};
+    /// # use asclepius::LymanSlope;
+    /// # use asclepius::response::radiation::LymanComplicationProbability;
+    /// let m = LymanSlope::new(0.2_f64).expect("positive Lyman slope");
+    /// let law = LymanComplicationProbability::new(
+    ///     AbsorbedDose::from_unit::<Gray>(50.0),
+    ///     m,
+    /// )?;
+    /// assert_eq!(law.m().get(), 0.2);
+    /// # Ok::<(), asclepius::InvalidValue<f64>>(())
+    /// ```
+    ///
+    /// A Niemierko `gamma50` is a different quantity and does not substitute
+    /// for it. The call below differs from the one above only in the type of
+    /// the second argument, and does not compile:
+    ///
+    /// ```compile_fail
+    /// # use aequitas::systems::si::{quantities::AbsorbedDose, units::Gray};
+    /// # use asclepius::Gamma50;
+    /// # use asclepius::response::radiation::LymanComplicationProbability;
+    /// let gamma50 = Gamma50::new(2.0_f64).expect("positive gamma50");
+    /// let _ = LymanComplicationProbability::new(
+    ///     AbsorbedDose::from_unit::<Gray>(50.0),
+    ///     gamma50,
+    /// );
+    /// ```
     pub fn new(midpoint: AbsorbedDose<T>, m: LymanSlope<T>) -> Result<Self, InvalidValue<T>> {
         validation::positive_dose(midpoint)?;
         Ok(Self { midpoint, m })

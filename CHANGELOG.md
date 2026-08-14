@@ -26,8 +26,20 @@ All externally observable changes are recorded here.
 
 ### Added
 
+- Document the radiation-parameter separation in both directions on the
+  constructors themselves: each law's `new` now carries a working example
+  using its own parameter alongside a `compile_fail` example that differs
+  only in the second argument's type, so the pair evidences the type
+  distinction rather than a shared setup error.
+
 - Add an environment-gated crates.io Trusted Publishing workflow with
   package/version validation and short-lived OIDC credentials.
+
+### Fixed
+
+- Scope the README's scalar-genericity claim to the law core. The
+  `asclepius-coeus` gEUD adapter varies over the Coeus backend but is pinned
+  to `f64`, which the previous unqualified wording did not distinguish.
 
 - Publish Asclepius as a public Atlas provider. Helios and Kwavers now consume
   reviewed Git revisions directly, without sibling-directory source patches.
