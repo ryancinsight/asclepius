@@ -1,6 +1,6 @@
 # ADR 0001: Own shared biological response in Asclepius
 
-- Status: accepted
+- Status: Accepted
 - Change class: major, architectural
 - Date: 2026-07-20
 - Revision: 2026-08-13 — split the semantically distinct radiation-response
