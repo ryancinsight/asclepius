@@ -37,8 +37,8 @@ dependencies = [
 
 [[package]]
 name = "apollo-fft"
-version = "0.26.0"
-source = "git+https://github.com/ryancinsight/apollo.git#df899f9a2c10b56552902e3f3d10987ac5af9e10"
+version = "0.27.0"
+source = "git+https://github.com/ryancinsight/apollo.git#d585e0f5c6f6e45e5e551a5ec3ca29f41af5afab"
 dependencies = [
  "apollo-fft-macros",
  "apollo-leto-interop",
@@ -60,7 +60,7 @@ dependencies = [
 [[package]]
 name = "apollo-fft-macros"
 version = "0.2.0"
-source = "git+https://github.com/ryancinsight/apollo.git#df899f9a2c10b56552902e3f3d10987ac5af9e10"
+source = "git+https://github.com/ryancinsight/apollo.git#d585e0f5c6f6e45e5e551a5ec3ca29f41af5afab"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -70,7 +70,7 @@ dependencies = [
 [[package]]
 name = "apollo-leto-interop"
 version = "0.18.0"
-source = "git+https://github.com/ryancinsight/apollo.git#df899f9a2c10b56552902e3f3d10987ac5af9e10"
+source = "git+https://github.com/ryancinsight/apollo.git#d585e0f5c6f6e45e5e551a5ec3ca29f41af5afab"
 dependencies = [
  "leto",
 ]
@@ -224,7 +224,7 @@ dependencies = [
 [[package]]
 name = "coeus-autograd"
 version = "0.10.0"
-source = "git+https://github.com/ryancinsight/Coeus.git#4737fe0d2711242d109d76d32703640236da6f9f"
+source = "git+https://github.com/ryancinsight/Coeus.git#79f05dfd8cc63d132bbce4cbe275a385098dcd82"
 dependencies = [
  "apollo-fft",
  "coeus-core",
@@ -239,7 +239,7 @@ dependencies = [
 [[package]]
 name = "coeus-core"
 version = "0.10.0"
-source = "git+https://github.com/ryancinsight/Coeus.git#4737fe0d2711242d109d76d32703640236da6f9f"
+source = "git+https://github.com/ryancinsight/Coeus.git#79f05dfd8cc63d132bbce4cbe275a385098dcd82"
 dependencies = [
  "bytemuck",
  "eunomia",
@@ -254,7 +254,7 @@ dependencies = [
 [[package]]
 name = "coeus-leto"
 version = "0.10.0"
-source = "git+https://github.com/ryancinsight/Coeus.git#4737fe0d2711242d109d76d32703640236da6f9f"
+source = "git+https://github.com/ryancinsight/Coeus.git#79f05dfd8cc63d132bbce4cbe275a385098dcd82"
 dependencies = [
  "coeus-core",
  "leto",
@@ -264,7 +264,7 @@ dependencies = [
 [[package]]
 name = "coeus-ops"
 version = "0.10.0"
-source = "git+https://github.com/ryancinsight/Coeus.git#4737fe0d2711242d109d76d32703640236da6f9f"
+source = "git+https://github.com/ryancinsight/Coeus.git#79f05dfd8cc63d132bbce4cbe275a385098dcd82"
 dependencies = [
  "bytemuck",
  "coeus-core",
@@ -282,7 +282,7 @@ dependencies = [
 [[package]]
 name = "coeus-sparse"
 version = "0.10.0"
-source = "git+https://github.com/ryancinsight/Coeus.git#4737fe0d2711242d109d76d32703640236da6f9f"
+source = "git+https://github.com/ryancinsight/Coeus.git#79f05dfd8cc63d132bbce4cbe275a385098dcd82"
 dependencies = [
  "coeus-core",
  "coeus-tensor",
@@ -293,7 +293,7 @@ dependencies = [
 [[package]]
 name = "coeus-tensor"
 version = "0.10.0"
-source = "git+https://github.com/ryancinsight/Coeus.git#4737fe0d2711242d109d76d32703640236da6f9f"
+source = "git+https://github.com/ryancinsight/Coeus.git#79f05dfd8cc63d132bbce4cbe275a385098dcd82"
 dependencies = [
  "bytemuck",
  "coeus-core",
@@ -337,7 +337,7 @@ dependencies = [
 [[package]]
 name = "eunomia"
 version = "0.8.0"
-source = "git+https://github.com/ryancinsight/eunomia#88c685f2a733df73f753f2351b2e4d2ede8ff478"
+source = "git+https://github.com/ryancinsight/eunomia#bab4f9f87cd19291dbfbf0645449a7177c2762ea"
 dependencies = [
  "bytemuck",
  "libm",
@@ -516,7 +516,7 @@ checksum = "ed5909b6e89a2db4456e54cd5f673791d7eca6732202bbf2a9cc504fe2f9b84a"
 [[package]]
 name = "hermes-simd"
 version = "0.7.0"
-source = "git+https://github.com/ryancinsight/hermes.git#c6265cb4660f358b34224b1159f36e31b5704cb1"
+source = "git+https://github.com/ryancinsight/hermes.git#525f4a4ae2aba0745e8b039c827741df7c1606dc"
 dependencies = [
  "eunomia",
  "hermes-simd-core",
@@ -530,7 +530,7 @@ dependencies = [
 [[package]]
 name = "hermes-simd-core"
 version = "0.7.0"
-source = "git+https://github.com/ryancinsight/hermes.git#c6265cb4660f358b34224b1159f36e31b5704cb1"
+source = "git+https://github.com/ryancinsight/hermes.git#525f4a4ae2aba0745e8b039c827741df7c1606dc"
 dependencies = [
  "bytemuck",
  "eunomia",
@@ -542,7 +542,7 @@ dependencies = [
 [[package]]
 name = "hermes-simd-intrinsics"
 version = "0.7.0"
-source = "git+https://github.com/ryancinsight/hermes.git#c6265cb4660f358b34224b1159f36e31b5704cb1"
+source = "git+https://github.com/ryancinsight/hermes.git#525f4a4ae2aba0745e8b039c827741df7c1606dc"
 dependencies = [
  "eunomia",
  "hermes-simd-core",
@@ -551,7 +551,7 @@ dependencies = [
 [[package]]
 name = "hermes-simd-macros"
 version = "0.7.0"
-source = "git+https://github.com/ryancinsight/hermes.git#c6265cb4660f358b34224b1159f36e31b5704cb1"
+source = "git+https://github.com/ryancinsight/hermes.git#525f4a4ae2aba0745e8b039c827741df7c1606dc"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -561,7 +561,7 @@ dependencies = [
 [[package]]
 name = "hermes-simd-types"
 version = "0.7.0"
-source = "git+https://github.com/ryancinsight/hermes.git#c6265cb4660f358b34224b1159f36e31b5704cb1"
+source = "git+https://github.com/ryancinsight/hermes.git#525f4a4ae2aba0745e8b039c827741df7c1606dc"
 dependencies = [
  "hermes-simd-core",
  "hermes-simd-intrinsics",
@@ -603,7 +603,7 @@ checksum = "bbd2bcb4c963f2ddae06a2efc7e9f3591312473c50c6685e1f298068316e66fe"
 [[package]]
 name = "leto"
 version = "0.42.0"
-source = "git+https://github.com/ryancinsight/leto.git#d966e32ce86c0fd230053977ffba5480125ab1d6"
+source = "git+https://github.com/ryancinsight/leto.git#1402668167777860b3834c0cdf2a2c41a6686a8d"
 dependencies = [
  "aequitas",
  "eunomia",
@@ -615,7 +615,7 @@ dependencies = [
 [[package]]
 name = "leto-ops"
 version = "0.42.0"
-source = "git+https://github.com/ryancinsight/leto.git#d966e32ce86c0fd230053977ffba5480125ab1d6"
+source = "git+https://github.com/ryancinsight/leto.git#1402668167777860b3834c0cdf2a2c41a6686a8d"
 dependencies = [
  "eunomia",
  "hermes-simd",
@@ -684,7 +684,7 @@ dependencies = [
 [[package]]
 name = "melinoe"
 version = "0.9.0"
-source = "git+https://github.com/ryancinsight/melinoe.git#b521113c1b9530e509c8c868980a6f05e6d16335"
+source = "git+https://github.com/ryancinsight/melinoe.git#689f5621ce881c2e55674a1a0144d4e476e62ec2"
 
 [[package]]
 name = "memchr"
@@ -704,7 +704,7 @@ dependencies = [
 [[package]]
 name = "mnemosyne-arena"
 version = "0.4.0"
-source = "git+https://github.com/ryancinsight/Mnemosyne.git#d48f4842da1ea059f45a0c3e0f96c7e97893254c"
+source = "git+https://github.com/ryancinsight/Mnemosyne.git#ea0839bbb52ced140f86e83b7899b7ec51903f0c"
 dependencies = [
  "eunomia",
  "mnemosyne-backend",
@@ -715,7 +715,7 @@ dependencies = [
 [[package]]
 name = "mnemosyne-backend"
 version = "0.5.0"
-source = "git+https://github.com/ryancinsight/Mnemosyne.git#d48f4842da1ea059f45a0c3e0f96c7e97893254c"
+source = "git+https://github.com/ryancinsight/Mnemosyne.git#ea0839bbb52ced140f86e83b7899b7ec51903f0c"
 dependencies = [
  "mnemosyne-memory-core",
 ]
@@ -723,12 +723,12 @@ dependencies = [
 [[package]]
 name = "mnemosyne-build-util"
 version = "0.2.0"
-source = "git+https://github.com/ryancinsight/Mnemosyne.git#d48f4842da1ea059f45a0c3e0f96c7e97893254c"
+source = "git+https://github.com/ryancinsight/Mnemosyne.git#ea0839bbb52ced140f86e83b7899b7ec51903f0c"
 
 [[package]]
 name = "mnemosyne-decay"
 version = "0.3.0"
-source = "git+https://github.com/ryancinsight/Mnemosyne.git#d48f4842da1ea059f45a0c3e0f96c7e97893254c"
+source = "git+https://github.com/ryancinsight/Mnemosyne.git#ea0839bbb52ced140f86e83b7899b7ec51903f0c"
 dependencies = [
  "mnemosyne-arena",
  "mnemosyne-backend",
@@ -738,7 +738,7 @@ dependencies = [
 [[package]]
 name = "mnemosyne-heap"
 version = "0.4.0"
-source = "git+https://github.com/ryancinsight/Mnemosyne.git#d48f4842da1ea059f45a0c3e0f96c7e97893254c"
+source = "git+https://github.com/ryancinsight/Mnemosyne.git#ea0839bbb52ced140f86e83b7899b7ec51903f0c"
 dependencies = [
  "libc",
  "melinoe",
@@ -753,7 +753,7 @@ dependencies = [
 [[package]]
 name = "mnemosyne-local"
 version = "0.4.0"
-source = "git+https://github.com/ryancinsight/Mnemosyne.git#d48f4842da1ea059f45a0c3e0f96c7e97893254c"
+source = "git+https://github.com/ryancinsight/Mnemosyne.git#ea0839bbb52ced140f86e83b7899b7ec51903f0c"
 dependencies = [
  "melinoe",
  "mnemosyne-arena",
@@ -768,7 +768,7 @@ dependencies = [
 [[package]]
 name = "mnemosyne-memory"
 version = "0.7.0"
-source = "git+https://github.com/ryancinsight/Mnemosyne.git#d48f4842da1ea059f45a0c3e0f96c7e97893254c"
+source = "git+https://github.com/ryancinsight/Mnemosyne.git#ea0839bbb52ced140f86e83b7899b7ec51903f0c"
 dependencies = [
  "eunomia",
  "mnemosyne-arena",
@@ -783,7 +783,7 @@ dependencies = [
 [[package]]
 name = "mnemosyne-memory-core"
 version = "0.2.0"
-source = "git+https://github.com/ryancinsight/Mnemosyne.git#d48f4842da1ea059f45a0c3e0f96c7e97893254c"
+source = "git+https://github.com/ryancinsight/Mnemosyne.git#ea0839bbb52ced140f86e83b7899b7ec51903f0c"
 dependencies = [
  "loom",
 ]
@@ -791,7 +791,7 @@ dependencies = [
 [[package]]
 name = "mnemosyne-prof"
 version = "0.2.0"
-source = "git+https://github.com/ryancinsight/Mnemosyne.git#d48f4842da1ea059f45a0c3e0f96c7e97893254c"
+source = "git+https://github.com/ryancinsight/Mnemosyne.git#ea0839bbb52ced140f86e83b7899b7ec51903f0c"
 dependencies = [
  "backtrace",
  "mnemosyne-build-util",
@@ -1425,7 +1425,7 @@ dependencies = [
 [[package]]
 name = "themis-topology"
 version = "0.10.1"
-source = "git+https://github.com/ryancinsight/themis.git#f61173bc8c3ecd28fcdea7b35a0b1aed841f79a0"
+source = "git+https://github.com/ryancinsight/themis.git#d0fcce7aced31b3554fc33a9c20e40b37531e359"
 dependencies = [
  "melinoe",
 ]
@@ -1563,9 +1563,9 @@ checksum = "e6e4313cd5fcd3dad5cafa179702e2b244f760991f45397d14d4ebf38247da75"
 
 [[package]]
 name = "uuid"
-version = "1.24.0"
+version = "1.24.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "bf3923a6f5c4c6382e0b653c4117f48d631ea17f38ed86e2a828e6f7412f5239"
+checksum = "2cefc03fd367c0c6d4305de1b312cf00248c4114f4a0418ce6a6af769e3b0bd9"
 dependencies = [
  "js-sys",
  "wasm-bindgen",
