@@ -12,7 +12,7 @@ observation family `AbsorbedDose<T>`.
 
 `LogisticControlProbability<T>` evaluates
 
-```
+```text
 TCP = 1 / (1 + (D50 / D)^(4 gamma50))
 ```
 
@@ -42,7 +42,7 @@ assert!(tcp.get() > 0.5); // above the midpoint dose
 `LymanComplicationProbability<T>` evaluates the Lyman model at uniform dose
 through the standard-normal CDF:
 
-```
+```text
 t = (D - TD50) / (m TD50)
 NTCP = Phi(t)
 ```
