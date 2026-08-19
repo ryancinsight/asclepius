@@ -4,7 +4,7 @@
 uniform dose for a sample of absorbed doses `D_i >= 0` and a finite non-zero
 volume-effect exponent `a`:
 
-```
+```text
 gEUD = ((1/N) sum_i D_i^a)^(1/a)
 ```
 

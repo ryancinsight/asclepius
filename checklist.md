@@ -2,9 +2,15 @@
 
 ## Codex
 
-- [ ] Publish `asclepius` from a standalone exact-source archive, register its
-      Trusted Publisher, enforce trusted-publishing-only mode, and create the
-      matching GitHub Release.
+- [x] Validate the `asclepius` standalone exact-source archive with
+      `cargo publish --manifest-path crates/asclepius/Cargo.toml --package
+      asclepius --locked --dry-run` at provider head `db33cca`. Cargo confirms
+      the existing crates.io package identity, packages 35 files (95.8 KiB),
+      and verifies the package successfully.
+- [ ] Configure and verify the crates.io Trusted Publisher, enable
+      trusted-publishing-only mode, and create the matching GitHub Release.
+      This remains an external release-authority action; repository-side
+      packaging is complete.
 - [x] Audit current Helios and Kwavers response ownership.
 - [x] Verify primary mathematical sources and model limitations.
 - [x] Add the required Aequitas dimensional vocabulary.

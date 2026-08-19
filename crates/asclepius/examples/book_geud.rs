@@ -5,6 +5,9 @@
 //! for large positive `a` (serial tissue) gEUD approaches the maximum dose.
 //! For uniform dose distributions gEUD equals the dose regardless of `a`.
 
+extern crate aequitas;
+extern crate asclepius;
+
 use aequitas::systems::si::quantities::AbsorbedDose;
 use asclepius::response::radiation::GeneralizedEquivalentUniformDose;
 use asclepius::{BiologicalResponse, VolumeEffect};
@@ -30,7 +33,8 @@ fn main() {
 
     // ── Non-uniform dose: a = 1 gives the mean ──
     let doses_mixed: Vec<AbsorbedDose<f64>> = [1.0_f64, 2.0, 3.0, 4.0]
-        .into_iter()
+        .iter()
+        .copied()
         .map(AbsorbedDose::from_base)
         .collect();
     let a1 = VolumeEffect::new(1.0_f64).expect("a=1");

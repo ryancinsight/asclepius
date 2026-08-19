@@ -4,6 +4,8 @@
 //! computations can trust their inputs.  This example exercises the
 //! complete validation surface of the most-used value types.
 
+extern crate asclepius;
+
 use asclepius::{Gamma50, InvalidValue, Probability, VolumeEffect};
 
 fn main() {
