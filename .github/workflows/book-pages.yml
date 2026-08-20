@@ -20,3 +20,6 @@ jobs:
       id-token: write
     with:
       output-path: target/book/asclepius
+      mdbook-test: true
+      rust-toolchain: "1.97.0"
+      cargo-package: asclepius
