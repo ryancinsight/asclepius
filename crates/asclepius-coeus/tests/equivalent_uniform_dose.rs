@@ -56,6 +56,63 @@ where
     }
 }
 
+fn evaluate_value<B>(doses: &[f64], exponent: f64) -> f64
+where
+    B: BackendOps<f64> + Default,
+    B::DeviceBuffer<f64>: CpuAddressableStorage<f64> + CpuAddressableStorageMut<f64>,
+{
+    let exponent = VolumeEffect::new(exponent).expect("fixture exponent is non-zero");
+    let variable = Var::<f64, B>::new(Tensor::from_slice([doses.len()], doses), false);
+    generalized_equivalent_uniform_dose(&variable, exponent)
+        .expect("fixture doses satisfy the response domain")
+        .tensor
+        .as_slice()[0]
+}
+
+fn central_difference_gradient<B>(doses: [f64; 3], index: usize, exponent: f64) -> (f64, f64)
+where
+    B: BackendOps<f64> + Default,
+    B::DeviceBuffer<f64>: CpuAddressableStorage<f64> + CpuAddressableStorageMut<f64>,
+{
+    let coordinate_scale = doses[index].abs().max(1.0);
+    // h = sqrt(epsilon) * scale balances O(h²) central-difference truncation
+    // against O(epsilon / h) value-evaluation roundoff.
+    let step = f64::EPSILON.sqrt() * coordinate_scale;
+    let half_step = step / 2.0;
+
+    let mut plus = doses;
+    plus[index] += step;
+    let mut minus = doses;
+    minus[index] -= step;
+    let coarse = (evaluate_value::<B>(&plus, exponent) - evaluate_value::<B>(&minus, exponent))
+        / (2.0 * step);
+
+    let mut half_plus = doses;
+    half_plus[index] += half_step;
+    let mut half_minus = doses;
+    half_minus[index] -= half_step;
+    let fine = (evaluate_value::<B>(&half_plus, exponent)
+        - evaluate_value::<B>(&half_minus, exponent))
+        / (2.0 * half_step);
+
+    // Richardson extrapolation cancels the leading O(h²) term. The remaining
+    // truncation estimate is |fine - coarse| / 3. Existing adapter tests bound
+    // one value path by 64 ulps; the half-step subtraction doubles that bound.
+    let extrapolated = fine + (fine - coarse) / 3.0;
+    let truncation = (fine - coarse).abs() / 3.0;
+    let value_scale = [
+        evaluate_value::<B>(&plus, exponent),
+        evaluate_value::<B>(&minus, exponent),
+        evaluate_value::<B>(&half_plus, exponent),
+        evaluate_value::<B>(&half_minus, exponent),
+    ]
+    .into_iter()
+    .map(f64::abs)
+    .fold(1.0, f64::max);
+    let roundoff = 128.0 * f64::EPSILON * value_scale / step;
+    (extrapolated, truncation + roundoff)
+}
+
 #[test]
 fn moirai_backend_matches_core_value_and_analytic_gradient() {
     assert_backend_contract::<MoiraiBackend>();
@@ -64,6 +121,42 @@ fn moirai_backend_matches_core_value_and_analytic_gradient() {
 #[test]
 fn sequential_backend_matches_core_value_and_analytic_gradient() {
     assert_backend_contract::<SequentialBackend>();
+}
+
+fn assert_central_difference_contract<B>()
+where
+    B: BackendOps<f64> + Default,
+    B::DeviceBuffer<f64>: CpuAddressableStorage<f64> + CpuAddressableStorageMut<f64>,
+{
+    let doses = [40.0, 50.0, 60.0];
+    let exponent = VolumeEffect::new(2.5).expect("fixture exponent is non-zero");
+    let variable = Var::<f64, B>::new(Tensor::from_slice([doses.len()], &doses), true);
+    let response = generalized_equivalent_uniform_dose(&variable, exponent)
+        .expect("fixture doses satisfy the response domain");
+    sum(&response)
+        .backward()
+        .expect("fixture response supports reverse differentiation");
+    let gradient = variable
+        .grad()
+        .expect("tracked dose variable receives a gradient");
+
+    for (index, &actual) in gradient.as_slice().iter().enumerate() {
+        let (expected, tolerance) = central_difference_gradient::<B>(doses, index, exponent.get());
+        assert!(
+            (actual - expected).abs() <= tolerance,
+            "gradient coordinate {index}: autodiff={actual}, finite_difference={expected}, bound={tolerance}"
+        );
+    }
+}
+
+#[test]
+fn moirai_gradient_matches_independent_central_difference() {
+    assert_central_difference_contract::<MoiraiBackend>();
+}
+
+#[test]
+fn sequential_gradient_matches_independent_central_difference() {
+    assert_central_difference_contract::<SequentialBackend>();
 }
 
 #[test]
