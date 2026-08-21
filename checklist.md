@@ -1,5 +1,12 @@
 # Asclepius execution checklist
 
+## ASC-VER-016 — Close CI verification gaps
+
+- [ ] Add `--locked` to every cargo gate that resolves the workspace.
+- [ ] Add pinned SemVer and Rust 1.95 MSRV jobs; make Rustdoc warning-denied.
+- [ ] Validate the workflow and focused local gates.
+- [ ] Push the branch and record exact-head hosted results.
+
 ## Codex
 
 - [x] Validate the `asclepius` standalone exact-source archive with
