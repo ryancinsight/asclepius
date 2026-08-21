@@ -19,12 +19,43 @@ jobs:
           components: clippy,rustfmt
       - uses: taiki-e/install-action@ea4c0b50b0d394ee91c5bb68a6a295b0556feb8e
       - run: cargo fmt --check
-      - run: cargo check --workspace --all-features
-      - run: cargo check -p asclepius --no-default-features
-      - run: cargo clippy --workspace --all-targets --all-features -- -D warnings
-      - run: cargo nextest run --workspace --all-features
-      - run: cargo test --doc --workspace --all-features
-      - run: cargo doc --workspace --no-deps --all-features
+      - run: cargo check --locked --workspace --all-features
+      - run: cargo check --locked -p asclepius --no-default-features
+      - run: cargo clippy --locked --workspace --all-targets --all-features -- -D warnings
+      - run: cargo nextest run --locked --workspace --all-features
+      - run: cargo test --locked --doc --workspace --all-features
+      - name: Documentation
+        env:
+          RUSTDOCFLAGS: -D warnings
+        run: cargo doc --locked --workspace --no-deps --all-features
+
+  msrv:
+    name: MSRV
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: dtolnay/rust-toolchain@a5f673d0ba8626c3977bb416a1612774bc82181b
+        with:
+          toolchain: 1.95.0
+      - name: Build at declared MSRV
+        run: cargo check --locked --workspace --all-targets --all-features
+
+  semver:
+    name: SemVer
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          fetch-depth: 0
+      - uses: obi1kenobi/cargo-semver-checks-action@6b69fcf40e9b5fb17adeb57e4b6ecd020649a239
+        with:
+          package: asclepius
+          manifest-path: Cargo.toml
+          rust-toolchain: 1.97.0
+          baseline-rev: ${{ github.event.pull_request.base.sha || github.event.before }}
+          verbose: true
 
   supply-chain:
     runs-on: ubuntu-latest
