@@ -27,3 +27,43 @@
       Atlas; the final parent pin sweep advances this PM-complete head.
 - [x] Consolidate Aequitas, Eunomia, and Coeus onto versioned Git source
       identities; verify both packages and publish the consumer-compatible head.
+
+## gap-audit-2026-08-20 (owner: atlas-gap-audit)
+
+Ordered so that the citation work lands before the reference cases that depend
+on it, and so that book items wait for the in-flight book CI branch.
+
+- [x] Audit declared scope against the tree at head `b660646` by static
+      evidence only; file the findings as backlog items ASC-VER-010 through
+      ASC-PM-020.
+- [ ] ASC-DOC-012: add a resolvable locator (DOI, PMID, or report section) to
+      the Rustdoc of `GeneralizedEquivalentUniformDose`,
+      `LogisticControlProbability`, `LymanComplicationProbability`, `Cem43`,
+      `ArrheniusDamage`, and the Coeus adapter. The sources exist only in
+      README.md today.
+- [ ] ASC-VER-010: add off-midpoint TCP and NTCP reference cases. Confirm the
+      new assertions fail when the Niemierko `4` factor or the Lyman `TD50`
+      normalization is perturbed, since every current assertion holds for any
+      positive parameter value.
+- [ ] ASC-VER-013: add a Niemierko or TG-166 worked gEUD value as an
+      independent oracle beside the existing same-formula differential test.
+- [ ] ASC-VER-011: add an Arrhenius case with published kinetic parameters at
+      a physiological absolute temperature; the present oracle uses
+      `A = 2`, `Ea = 1`, `R = 1` at `T = 1 K`.
+- [ ] ASC-VER-018: add a central-difference gradient check to the Coeus
+      adapter tests and write the gradient derivation into the adapter Rustdoc
+      and an ADR 0001 theorem.
+- [ ] ASC-VER-016: add `--locked`, a `cargo-semver-checks` step, an MSRV job at
+      `1.95`, and `RUSTDOCFLAGS=-D warnings` to `.github/workflows/ci.yml`.
+- [ ] ASC-DOC-019: bring the README example under a compiled gate.
+- [ ] ASC-ARCH-017: check what scalars Coeus `Var` supports, then either
+      generalize the adapter or record the restriction in ADR 0001.
+- [ ] ASC-SCOPE-021: draft the ADR revision settling LQ, BED/EQD2, alpha-beta,
+      fractionation, and the Kutcher-Burman volume reduction as owned or
+      out of scope.
+- [ ] ASC-DOC-014 and ASC-VER-015: after the `ci/asclepius-book-test` branch
+      merges, add the thermal, composition, and tissue chapters and make the
+      six `rust,ignore` prose fences executable.
+- [ ] ASC-PM-020: coordinate with the Atlas ADR index tooling owner so the
+      regeneration command in `docs/adr/README.md` resolves from a standalone
+      clone.
