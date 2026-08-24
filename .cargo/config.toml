@@ -1,0 +1,37 @@
+# Local-only Atlas overlay for repos/asclepius.
+#
+# This file is an untracked Atlas-management override. The upstream
+# asclepius repository does not see this file; it lives only in the
+# Atlas working tree, alongside the Atlas-level .cargo/config.toml at
+# D:/atlas/.cargo/config.toml, which itself documents that "Per-repo
+# .cargo/config.toml settings ... still merge and take precedence over
+# this file."
+#
+# Why an absolute path:
+#   cargo resolves `target-dir` relative to the workspace root. When
+#   cargo is invoked inside repos/asclepius/, the workspace root is
+#   repos/asclepius/, so a relative target-dir (e.g. "target") resolves
+#   back to repos/asclepius/target/ and re-creates the very fork this
+#   overlay is meant to prevent. The Atlas-level `target-dir = "target"`
+#   only works for Atlas-LEVEL builds rooted at D:/atlas/; it does
+#   nothing for in-submodule builds. An absolute path here is the only
+#   way to force an in-repo build to write into the shared cache.
+#
+# Why a subdir of the shared cache:
+#   The shared cache at D:/atlas/target/ uses profile-keyed subdirs
+#   (debug/, release/, x86_64-*/, ...). The D:/atlas/target/asclepius/
+#   subdirectory already holds the relocated artifacts from the
+#   April 2026 fork remediation (see gap_audit.md "target_forks
+#   residual collapsed to 0"). New in-repo builds will compose with
+#   those relocated artifacts through cargo's standard fingerprint
+#   reuse logic.
+#
+# Why this is intentionally not committed:
+#   This pin is Atlas-specific. The upstream asclepius repository is
+#   expected to build cleanly on its own with target-dir falling back
+#   to its local target/. Committing an absolute Windows path into the
+#   upstream `.cargo/config.toml` would break portable development.
+#   The submodule's git status will show this file as untracked; that is
+#   the intended state.
+[build]
+target-dir = "D:/atlas/target/asclepius"
