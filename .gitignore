@@ -1,3 +1,6 @@
 /target
 /.semver
 **/*.proptest-regressions
+
+# Atlas local overlay (untracked by design; see .cargo/config.toml header)
+.cargo/config.toml
