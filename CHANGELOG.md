@@ -4,6 +4,12 @@ All externally observable changes are recorded here.
 
 ## Unreleased
 
+### Fixed
+
+- Close the continuous-integration verification gap: locked workspace gates,
+  warning-denied Rustdoc, a Rust 1.95 MSRV check, and a pinned SemVer check
+  now run on pull requests.
+
 ### Changed
 
 - Separate the Niemierko `Gamma50<T>` and Lyman `LymanSlope<T>` parameters;
