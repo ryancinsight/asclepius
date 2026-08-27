@@ -38,7 +38,7 @@ dependencies = [
 [[package]]
 name = "apollo-fft"
 version = "0.27.0"
-source = "git+https://github.com/ryancinsight/apollo.git#d585e0f5c6f6e45e5e551a5ec3ca29f41af5afab"
+source = "git+https://github.com/ryancinsight/apollo.git#94aabac65f8bba0047e3570d8bb19b5d2ed9b85c"
 dependencies = [
  "apollo-fft-macros",
  "apollo-leto-interop",
@@ -60,7 +60,7 @@ dependencies = [
 [[package]]
 name = "apollo-fft-macros"
 version = "0.2.0"
-source = "git+https://github.com/ryancinsight/apollo.git#d585e0f5c6f6e45e5e551a5ec3ca29f41af5afab"
+source = "git+https://github.com/ryancinsight/apollo.git#94aabac65f8bba0047e3570d8bb19b5d2ed9b85c"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -70,7 +70,7 @@ dependencies = [
 [[package]]
 name = "apollo-leto-interop"
 version = "0.18.0"
-source = "git+https://github.com/ryancinsight/apollo.git#d585e0f5c6f6e45e5e551a5ec3ca29f41af5afab"
+source = "git+https://github.com/ryancinsight/apollo.git#94aabac65f8bba0047e3570d8bb19b5d2ed9b85c"
 dependencies = [
  "leto",
 ]
@@ -516,7 +516,7 @@ checksum = "ed5909b6e89a2db4456e54cd5f673791d7eca6732202bbf2a9cc504fe2f9b84a"
 [[package]]
 name = "hermes-simd"
 version = "0.7.0"
-source = "git+https://github.com/ryancinsight/hermes.git#525f4a4ae2aba0745e8b039c827741df7c1606dc"
+source = "git+https://github.com/ryancinsight/hermes.git#15c195863eda386622df06a72e2fca61015b3147"
 dependencies = [
  "eunomia",
  "hermes-simd-core",
@@ -530,7 +530,7 @@ dependencies = [
 [[package]]
 name = "hermes-simd-core"
 version = "0.7.0"
-source = "git+https://github.com/ryancinsight/hermes.git#525f4a4ae2aba0745e8b039c827741df7c1606dc"
+source = "git+https://github.com/ryancinsight/hermes.git#15c195863eda386622df06a72e2fca61015b3147"
 dependencies = [
  "bytemuck",
  "eunomia",
@@ -542,7 +542,7 @@ dependencies = [
 [[package]]
 name = "hermes-simd-intrinsics"
 version = "0.7.0"
-source = "git+https://github.com/ryancinsight/hermes.git#525f4a4ae2aba0745e8b039c827741df7c1606dc"
+source = "git+https://github.com/ryancinsight/hermes.git#15c195863eda386622df06a72e2fca61015b3147"
 dependencies = [
  "eunomia",
  "hermes-simd-core",
@@ -551,7 +551,7 @@ dependencies = [
 [[package]]
 name = "hermes-simd-macros"
 version = "0.7.0"
-source = "git+https://github.com/ryancinsight/hermes.git#525f4a4ae2aba0745e8b039c827741df7c1606dc"
+source = "git+https://github.com/ryancinsight/hermes.git#15c195863eda386622df06a72e2fca61015b3147"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -561,7 +561,7 @@ dependencies = [
 [[package]]
 name = "hermes-simd-types"
 version = "0.7.0"
-source = "git+https://github.com/ryancinsight/hermes.git#525f4a4ae2aba0745e8b039c827741df7c1606dc"
+source = "git+https://github.com/ryancinsight/hermes.git#15c195863eda386622df06a72e2fca61015b3147"
 dependencies = [
  "hermes-simd-core",
  "hermes-simd-intrinsics",
@@ -603,7 +603,7 @@ checksum = "bbd2bcb4c963f2ddae06a2efc7e9f3591312473c50c6685e1f298068316e66fe"
 [[package]]
 name = "leto"
 version = "0.42.0"
-source = "git+https://github.com/ryancinsight/leto.git#1402668167777860b3834c0cdf2a2c41a6686a8d"
+source = "git+https://github.com/ryancinsight/leto.git#785debbc30a8876bc381310d28748df2abf5ea9c"
 dependencies = [
  "aequitas",
  "eunomia",
@@ -615,7 +615,7 @@ dependencies = [
 [[package]]
 name = "leto-ops"
 version = "0.42.0"
-source = "git+https://github.com/ryancinsight/leto.git#1402668167777860b3834c0cdf2a2c41a6686a8d"
+source = "git+https://github.com/ryancinsight/leto.git#785debbc30a8876bc381310d28748df2abf5ea9c"
 dependencies = [
  "eunomia",
  "hermes-simd",
