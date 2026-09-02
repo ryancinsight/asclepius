@@ -40,12 +40,18 @@ jobs:
   msrv:
     name: MSRV
     runs-on: ubuntu-latest
+    env:
+      # The install step sets a rustup *default*; the committed rust-toolchain.toml
+      # outranks it, so without this the job compiled with the pinned channel.
+      RUSTUP_TOOLCHAIN: 1.95.0
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
       - uses: dtolnay/rust-toolchain@a5f673d0ba8626c3977bb416a1612774bc82181b
         with:
           toolchain: 1.95.0
+      - name: Prove the toolchain under test
+        run: rustc --version && cargo --version
       - name: Build at declared MSRV
         run: cargo check --locked --workspace --all-targets --all-features
 
