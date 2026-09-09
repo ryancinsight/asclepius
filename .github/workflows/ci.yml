@@ -26,6 +26,17 @@ jobs:
         with:
           components: clippy,rustfmt
       - uses: taiki-e/install-action@ea4c0b50b0d394ee91c5bb68a6a295b0556feb8e
+      # Shared-key rust-cache so the check/clippy/test/doctest/doc build is
+      # warm across PRs instead of rebuilding from scratch each time. The
+      # entry is written from main only (concurrent branches cannot evict
+      # it); invalidation is incremental. Mirrors the CFDrs #375 / ritk #211
+      # / helios #75 / themis #32 / iris #20 lever under ATLAS-CI-RUNNER-
+      # SATURATION.
+      - uses: Swatinem/rust-cache@6323deb102c322ba6fcbdcafc7e3dddab59af2b6
+        with:
+          workspaces: .
+          shared-key: asclepius
+          save-if: ${{ github.ref == 'refs/heads/main' }}
       - run: cargo fmt --check
       - run: cargo check --locked --workspace --all-features
       - run: cargo check --locked -p asclepius --no-default-features
