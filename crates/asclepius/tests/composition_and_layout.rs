@@ -1,23 +1,12 @@
-//! Composition, ownership, representation, and allocation invariants.
+//! Composition, ownership, and representation invariants.
 
 use core::mem::{align_of, size_of};
 
-use aequitas::systems::si::{
-    quantities::{AbsorbedDose, ThermodynamicTemperature, Time},
-    units::Second,
-};
+use aequitas::systems::si::quantities::Time;
 use asclepius::{
-    BiologicalResponse, DamageIntegral, EquivalentExposure, Gamma50, Probability, Tissue,
-    response::{
-        composition::IndependentInsults,
-        radiation::LogisticControlProbability,
-        thermal::{Cem43, TemperatureSamples},
-    },
+    BiologicalResponse, DamageIntegral, EquivalentExposure, Probability,
+    response::composition::IndependentInsults,
 };
-use stats_alloc::{INSTRUMENTED_SYSTEM, Region, StatsAlloc};
-
-#[global_allocator]
-static ALLOCATOR: &StatsAlloc<std::alloc::System> = &INSTRUMENTED_SYSTEM;
 
 #[test]
 fn independent_insults_match_survival_product() {
@@ -53,49 +42,9 @@ fn wrappers_are_transparent_and_strategies_are_zero_sized() {
     assert_eq!(size_of::<IndependentInsults<8>>(), 0);
 }
 
-#[test]
-fn borrowed_tissue_evaluation_is_allocation_free() {
-    let model = LogisticControlProbability::new(
-        AbsorbedDose::from_base(50.0_f64),
-        Gamma50::new(0.2).expect("positive gamma50"),
-    )
-    .expect("positive midpoint");
-
-    let region = Region::new(ALLOCATOR);
-    let tissue = Tissue::borrowed("reference tissue", model);
-    let response = tissue
-        .evaluate(AbsorbedDose::from_base(50.0))
-        .expect("valid midpoint");
-    let change = region.change();
-
-    assert_eq!(response.get().to_bits(), 0.5_f64.to_bits());
-    assert_eq!(tissue.name().as_ptr(), "reference tissue".as_ptr());
-    assert_eq!(change.allocations, 0);
-    assert_eq!(change.reallocations, 0);
-    assert_eq!(change.deallocations, 0);
-}
-
-#[test]
-fn lazy_temperature_conversion_is_allocation_free() {
-    const KELVIN_OFFSET: f64 = 273.15;
-    let celsius = [42.0_f64, 43.0, 44.0];
-    let region = Region::new(ALLOCATOR);
-
-    let observation = TemperatureSamples::new(
-        celsius
-            .iter()
-            .copied()
-            .map(|value| ThermodynamicTemperature::from_base(value + KELVIN_OFFSET)),
-        Time::from_unit::<Second>(60.0),
-    )
-    .expect("valid stream");
-    let exposure = Cem43::canonical()
-        .evaluate_uniform(observation)
-        .expect("valid temperature stream");
-    let change = region.change();
-
-    assert_eq!(exposure.get().into_base().to_bits(), 195.0_f64.to_bits());
-    assert_eq!(change.allocations, 0);
-    assert_eq!(change.reallocations, 0);
-    assert_eq!(change.deallocations, 0);
-}
+// The allocation-measurement windows (`borrowed_tissue_evaluation_is_allocation_free`,
+// `lazy_temperature_conversion_is_allocation_free`) live in the dedicated
+// `allocation_instrument` test binary: the stats_alloc instrument is
+// process-global, so measuring inside a parallel harness let concurrent
+// tests' bookkeeping allocations leak into the windows and flake the
+// zero-allocation assertions.
