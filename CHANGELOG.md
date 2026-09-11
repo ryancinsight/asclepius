@@ -6,6 +6,17 @@ All externally observable changes are recorded here.
 
 ### Fixed
 
+- De-flake the allocation-instrumentation tests: the two zero-allocation
+  windows measured through the process-global `stats_alloc` allocator inside
+  one parallel libtest binary, so concurrent tests' bookkeeping allocations
+  leaked into the measured regions and the assertions failed
+  non-deterministically (roughly every other run under plain `cargo test`).
+  The windows now live in a dedicated `allocation_instrument` integration
+  test binary whose single test runs both windows sequentially in an
+  otherwise-allocating-free process; `composition_and_layout` keeps the
+  value, composition, and representation invariants. The nextest CI gate,
+  which isolates every test into its own process, was never affected.
+
 - Close the continuous-integration verification gap: locked workspace gates,
   warning-denied Rustdoc, a Rust 1.95 MSRV check, and a pinned SemVer check
   now run on pull requests.
