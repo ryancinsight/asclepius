@@ -111,8 +111,10 @@ crates/
 Every `lib.rs` and `mod.rs` is a manifest. Model families live in one canonical
 leaf, dependencies point inward, and the core crate is `no_std + alloc`.
 `BiologicalResponse<T>` uses a GAT for borrowed observations and associated
-output/error types. Models monomorphize over `T: eunomia::RealField`; there is
-no vtable, scalar widening, unit metadata, or hidden allocation.
+output/error types. Core-crate models monomorphize over
+`T: eunomia::RealField`; there is no vtable, scalar widening, unit metadata, or
+hidden allocation. The scalar-generic claim covers the law core only — the
+Coeus adapter is pinned to `f64`, as described below.
 `UniformTemperatureObservation<T>` seals the two supported observation shapes:
 borrowed `TemperatureHistory` and generic `TemperatureSamples<I, T>`.
 The iterator stays inline and monomorphizes into the same integration kernel.
@@ -120,10 +122,14 @@ The validated CEM43 rate and single-step CEM43 and Arrhenius methods reuse the
 identical increment laws for spatial solvers.
 
 `asclepius-coeus` depends outward on Coeus while core remains independent. Its
-gEUD operation is monomorphized over the Coeus backend, validates borrowed
+gEUD operation is monomorphized over the Coeus backend `B`, validates borrowed
 CPU-addressable dose storage without copying it, uses a detached normalization
 scale to reduce overflow, and preserves the exact analytical gradient because
-the normalized power mean is independent of every positive scale choice.
+the normalized power mean is independent of every positive scale choice. Its
+scalar is `f64` rather than a generic `T`: the operation takes `Var<f64, B>`
+and `VolumeEffect<f64>` under a `B: BackendOps<f64>` bound. The adapter varies
+over the backend dimension only, so a scalar-generic gEUD would require the
+Coeus backend bounds to be generic over the scalar first.
 
 ## Mathematical specification
 
