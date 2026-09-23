@@ -6,6 +6,14 @@ All externally observable changes are recorded here.
 
 ### Fixed
 
+- Ship the full Apache License 2.0 text in `LICENSE-APACHE`. The manifest
+  declares `MIT OR Apache-2.0`, but the file held only the short-form notice,
+  so published packages did not include the license terms they offered.
+
+- Scope the README's scalar-genericity claim to the law core. The
+  `asclepius-coeus` gEUD adapter varies over the Coeus backend but is pinned
+  to `f64`, which the previous unqualified wording did not distinguish.
+
 - De-flake the allocation-instrumentation tests: the two zero-allocation
   windows measured through the process-global `stats_alloc` allocator inside
   one parallel libtest binary, so concurrent tests' bookkeeping allocations
@@ -42,6 +50,12 @@ All externally observable changes are recorded here.
   parallel with the canonical source graph.
 
 ### Added
+
+- Document the radiation-parameter separation in both directions on the
+  constructors themselves: each law's `new` now carries a working example
+  using its own parameter alongside a `compile_fail` example that differs
+  only in the second argument's type, so the pair evidences the type
+  distinction rather than a shared setup error.
 
 - Add an environment-gated crates.io Trusted Publishing workflow with
   package/version validation and short-lived OIDC credentials.
