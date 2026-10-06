@@ -112,8 +112,8 @@ version = "0.1.0"
 dependencies = [
  "aequitas",
  "eunomia",
+ "mnemosyne-memory",
  "proptest",
- "stats_alloc",
 ]
 
 [[package]]
@@ -715,7 +715,7 @@ dependencies = [
 [[package]]
 name = "mnemosyne-arena"
 version = "0.6.0"
-source = "git+https://github.com/ryancinsight/Mnemosyne.git#3518c55e86444ac0c8be75046fbf4e75737379e2"
+source = "git+https://github.com/ryancinsight/Mnemosyne#3518c55e86444ac0c8be75046fbf4e75737379e2"
 dependencies = [
  "eunomia",
  "libc",
@@ -728,7 +728,7 @@ dependencies = [
 [[package]]
 name = "mnemosyne-backend"
 version = "0.6.0"
-source = "git+https://github.com/ryancinsight/Mnemosyne.git#3518c55e86444ac0c8be75046fbf4e75737379e2"
+source = "git+https://github.com/ryancinsight/Mnemosyne#3518c55e86444ac0c8be75046fbf4e75737379e2"
 dependencies = [
  "mnemosyne-memory-core",
 ]
@@ -736,12 +736,12 @@ dependencies = [
 [[package]]
 name = "mnemosyne-build-util"
 version = "0.2.1"
-source = "git+https://github.com/ryancinsight/Mnemosyne.git#3518c55e86444ac0c8be75046fbf4e75737379e2"
+source = "git+https://github.com/ryancinsight/Mnemosyne#3518c55e86444ac0c8be75046fbf4e75737379e2"
 
 [[package]]
 name = "mnemosyne-decay"
 version = "0.3.2"
-source = "git+https://github.com/ryancinsight/Mnemosyne.git#3518c55e86444ac0c8be75046fbf4e75737379e2"
+source = "git+https://github.com/ryancinsight/Mnemosyne#3518c55e86444ac0c8be75046fbf4e75737379e2"
 dependencies = [
  "mnemosyne-arena",
  "mnemosyne-backend",
@@ -751,7 +751,7 @@ dependencies = [
 [[package]]
 name = "mnemosyne-heap"
 version = "0.6.0"
-source = "git+https://github.com/ryancinsight/Mnemosyne.git#3518c55e86444ac0c8be75046fbf4e75737379e2"
+source = "git+https://github.com/ryancinsight/Mnemosyne#3518c55e86444ac0c8be75046fbf4e75737379e2"
 dependencies = [
  "libc",
  "melinoe",
@@ -766,7 +766,7 @@ dependencies = [
 [[package]]
 name = "mnemosyne-local"
 version = "0.6.0"
-source = "git+https://github.com/ryancinsight/Mnemosyne.git#3518c55e86444ac0c8be75046fbf4e75737379e2"
+source = "git+https://github.com/ryancinsight/Mnemosyne#3518c55e86444ac0c8be75046fbf4e75737379e2"
 dependencies = [
  "melinoe",
  "mnemosyne-arena",
@@ -781,7 +781,7 @@ dependencies = [
 [[package]]
 name = "mnemosyne-memory"
 version = "0.9.0"
-source = "git+https://github.com/ryancinsight/Mnemosyne.git#3518c55e86444ac0c8be75046fbf4e75737379e2"
+source = "git+https://github.com/ryancinsight/Mnemosyne#3518c55e86444ac0c8be75046fbf4e75737379e2"
 dependencies = [
  "eunomia",
  "mnemosyne-arena",
@@ -796,7 +796,7 @@ dependencies = [
 [[package]]
 name = "mnemosyne-memory-core"
 version = "0.3.0"
-source = "git+https://github.com/ryancinsight/Mnemosyne.git#3518c55e86444ac0c8be75046fbf4e75737379e2"
+source = "git+https://github.com/ryancinsight/Mnemosyne#3518c55e86444ac0c8be75046fbf4e75737379e2"
 dependencies = [
  "loom",
 ]
@@ -804,7 +804,7 @@ dependencies = [
 [[package]]
 name = "mnemosyne-prof"
 version = "0.2.1"
-source = "git+https://github.com/ryancinsight/Mnemosyne.git#3518c55e86444ac0c8be75046fbf4e75737379e2"
+source = "git+https://github.com/ryancinsight/Mnemosyne#3518c55e86444ac0c8be75046fbf4e75737379e2"
 dependencies = [
  "backtrace",
  "mnemosyne-build-util",
@@ -1385,12 +1385,6 @@ name = "static_assertions"
 version = "1.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "a2eb9349b6444b326872e140eb1cf5e7c522154d69e7a0ffb0fb81c06b37543f"
-
-[[package]]
-name = "stats_alloc"
-version = "0.1.10"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "5c0e04424e733e69714ca1bbb9204c1a57f09f5493439520f9f68c132ad25eec"
 
 [[package]]
 name = "syn"
