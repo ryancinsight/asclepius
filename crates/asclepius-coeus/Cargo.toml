@@ -13,7 +13,7 @@ categories = ["science"]
 publish = false
 
 [dependencies]
-asclepius = { version = "0.1.0", path = "../asclepius" }
+asclepius = { version = "0.2.0", path = "../asclepius" }
 coeus-autograd = { version = "0.10.0", git = "https://github.com/ryancinsight/Coeus.git", default-features = false }
 coeus-core = { version = "0.10.0", git = "https://github.com/ryancinsight/Coeus.git" }
 coeus-ops = { version = "0.10.0", git = "https://github.com/ryancinsight/Coeus.git", default-features = false }
