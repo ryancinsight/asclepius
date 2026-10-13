@@ -14,6 +14,18 @@ use coeus_core::{
 use coeus_ops::BackendOps;
 use coeus_tensor::Tensor;
 
+fn fixture_var<B>(doses: &[f64], requires_grad: bool) -> Var<f64, B>
+where
+    B: BackendOps<f64> + Default,
+    B::DeviceBuffer<f64>: CpuAddressableStorage<f64> + CpuAddressableStorageMut<f64>,
+{
+    Var::<f64, B>::new(
+        Tensor::from_slice([doses.len()], doses).expect("fixture shape matches data"),
+        requires_grad,
+    )
+    .expect("fixture gradient buffer allocation succeeds")
+}
+
 fn assert_backend_contract<B>()
 where
     B: BackendOps<f64> + Default,
@@ -21,7 +33,7 @@ where
 {
     let doses = [40.0, 50.0, 60.0];
     let exponent = VolumeEffect::new(2.5).expect("fixture exponent is non-zero");
-    let variable = Var::<f64, B>::new(Tensor::from_slice([doses.len()], &doses), true);
+    let variable = fixture_var::<B>(&doses, true);
     let response = generalized_equivalent_uniform_dose(&variable, exponent)
         .expect("fixture doses satisfy the response domain");
 
@@ -36,6 +48,7 @@ where
     assert!((response.tensor.as_slice()[0] - oracle.as_base()).abs() <= tolerance);
 
     sum(&response)
+        .expect("fixture response reduces")
         .backward()
         .expect("fixture response supports reverse differentiation");
     let gradient = variable
@@ -62,7 +75,7 @@ where
     B::DeviceBuffer<f64>: CpuAddressableStorage<f64> + CpuAddressableStorageMut<f64>,
 {
     let exponent = VolumeEffect::new(exponent).expect("fixture exponent is non-zero");
-    let variable = Var::<f64, B>::new(Tensor::from_slice([doses.len()], doses), false);
+    let variable = fixture_var::<B>(doses, false);
     generalized_equivalent_uniform_dose(&variable, exponent)
         .expect("fixture doses satisfy the response domain")
         .tensor
@@ -130,10 +143,11 @@ where
 {
     let doses = [40.0, 50.0, 60.0];
     let exponent = VolumeEffect::new(2.5).expect("fixture exponent is non-zero");
-    let variable = Var::<f64, B>::new(Tensor::from_slice([doses.len()], &doses), true);
+    let variable = fixture_var::<B>(&doses, true);
     let response = generalized_equivalent_uniform_dose(&variable, exponent)
         .expect("fixture doses satisfy the response domain");
     sum(&response)
+        .expect("fixture response reduces")
         .backward()
         .expect("fixture response supports reverse differentiation");
     let gradient = variable
@@ -163,7 +177,7 @@ fn sequential_gradient_matches_independent_central_difference() {
 fn stabilization_preserves_large_finite_doses() {
     let doses = [f64::MAX / 8.0, f64::MAX / 16.0];
     let exponent = VolumeEffect::new(4.0).expect("fixture exponent is non-zero");
-    let variable = Var::<f64, MoiraiBackend>::new(Tensor::from_slice([2], &doses), true);
+    let variable = fixture_var::<MoiraiBackend>(&doses, true);
     let response = generalized_equivalent_uniform_dose(&variable, exponent)
         .expect("large fixture doses are finite and non-negative");
 
@@ -177,20 +191,19 @@ fn invalid_observations_return_typed_errors() {
     let positive = VolumeEffect::new(2.0).expect("fixture exponent is non-zero");
     let negative = VolumeEffect::new(-2.0).expect("fixture exponent is non-zero");
 
-    let empty = Var::<f64, MoiraiBackend>::new(Tensor::from_slice([0], &[]), true);
+    let empty = fixture_var::<MoiraiBackend>(&[], true);
     assert!(matches!(
         generalized_equivalent_uniform_dose(&empty, positive),
         Err(AutodiffResponseError::EmptyObservation)
     ));
 
-    let invalid =
-        Var::<f64, MoiraiBackend>::new(Tensor::from_slice([3], &[1.0, f64::NAN, 3.0]), true);
+    let invalid = fixture_var::<MoiraiBackend>(&[1.0, f64::NAN, 3.0], true);
     assert!(matches!(
         generalized_equivalent_uniform_dose(&invalid, positive),
         Err(AutodiffResponseError::InvalidDose { index: 1, .. })
     ));
 
-    let zero = Var::<f64, MoiraiBackend>::new(Tensor::from_slice([2], &[1.0, 0.0]), true);
+    let zero = fixture_var::<MoiraiBackend>(&[1.0, 0.0], true);
     assert!(matches!(
         generalized_equivalent_uniform_dose(&zero, negative),
         Err(AutodiffResponseError::InvalidDose { index: 1, .. })

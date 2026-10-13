@@ -26,7 +26,9 @@ use crate::{AutodiffResponseError, DoseConstraint};
 ///
 /// Returns [`AutodiffResponseError::EmptyObservation`] for an empty tensor,
 /// [`AutodiffResponseError::InvalidDose`] for non-finite or negative doses, or
-/// for a zero dose with a negative volume-effect exponent.
+/// for a zero dose with a negative volume-effect exponent, and
+/// [`AutodiffResponseError::Backend`] when the Coeus backend fails while
+/// building the graph.
 ///
 /// # Examples
 ///
@@ -38,9 +40,11 @@ use crate::{AutodiffResponseError, DoseConstraint};
 /// use coeus_tensor::Tensor;
 ///
 /// let doses = Var::<f64, SequentialBackend>::new(
-///     Tensor::from_slice([3], &[40.0, 50.0, 60.0]),
+///     Tensor::from_slice([3], &[40.0, 50.0, 60.0])
+///         .expect("invariant: example shape matches data"),
 ///     true,
-/// );
+/// )
+/// .expect("invariant: example gradient buffer allocation succeeds");
 /// let exponent = VolumeEffect::new(1.0).expect("finite non-zero exponent");
 /// let geud = generalized_equivalent_uniform_dose(&doses, exponent)
 ///     .expect("valid absorbed doses");
@@ -51,7 +55,7 @@ use crate::{AutodiffResponseError, DoseConstraint};
 pub fn generalized_equivalent_uniform_dose<B>(
     doses: &Var<f64, B>,
     volume_effect: VolumeEffect<f64>,
-) -> Result<Var<f64, B>, AutodiffResponseError>
+) -> Result<Var<f64, B>, AutodiffResponseError<B::Error>>
 where
     B: BackendOps<f64> + Default,
     B::DeviceBuffer<f64>: CpuAddressableStorage<f64> + CpuAddressableStorageMut<f64>,
@@ -81,14 +85,18 @@ where
     }
 
     let backend = B::default();
-    let scale = Var::new(Tensor::from_slice_on([1], &[scale], &backend), false);
-    let normalized = div(doses, &scale);
-    let powered = pow(&normalized, exponent);
-    let mean_power = mean(&powered);
-    Ok(mul(&scale, &pow(&mean_power, exponent.recip())))
+    let scale = Var::new(Tensor::from_slice_on([1], &[scale], &backend)?, false)?;
+    let normalized = div(doses, &scale)?;
+    let powered = pow(&normalized, exponent)?;
+    let mean_power = mean(&powered)?;
+    Ok(mul(&scale, &pow(&mean_power, exponent.recip())?)?)
 }
 
-fn validate_dose(index: usize, dose: f64, exponent: f64) -> Result<(), AutodiffResponseError> {
+fn validate_dose<E>(
+    index: usize,
+    dose: f64,
+    exponent: f64,
+) -> Result<(), AutodiffResponseError<E>> {
     let constraint = if !dose.is_finite() {
         Some(DoseConstraint::Finite)
     } else if dose < 0.0 {
