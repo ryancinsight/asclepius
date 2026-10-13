@@ -25,9 +25,13 @@ impl fmt::Display for DoseConstraint {
 }
 
 /// Failure to construct a differentiable biological response.
-#[derive(Clone, Copy, Debug, PartialEq)]
+///
+/// `E` is the Coeus backend error (`B::Error`) raised while building the
+/// differentiable graph; it defaults to [`coeus_core::BackendError`], the
+/// error of every backend Coeus ships.
+#[derive(Clone, Debug, PartialEq)]
 #[non_exhaustive]
-pub enum AutodiffResponseError {
+pub enum AutodiffResponseError<E = coeus_core::BackendError> {
     /// The dose observation contains no elements.
     EmptyObservation,
     /// A dose element violates the model domain.
@@ -39,9 +43,17 @@ pub enum AutodiffResponseError {
         /// Required domain constraint.
         constraint: DoseConstraint,
     },
+    /// The Coeus backend failed while building the response graph.
+    Backend(E),
 }
 
-impl fmt::Display for AutodiffResponseError {
+impl<E> From<E> for AutodiffResponseError<E> {
+    fn from(error: E) -> Self {
+        Self::Backend(error)
+    }
+}
+
+impl<E: fmt::Display> fmt::Display for AutodiffResponseError<E> {
     fn fmt(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             Self::EmptyObservation => formatter.write_str("dose observation must not be empty"),
@@ -53,8 +65,16 @@ impl fmt::Display for AutodiffResponseError {
                 formatter,
                 "dose at logical index {index} is {value} but must be {constraint}"
             ),
+            Self::Backend(error) => write!(formatter, "coeus backend failure: {error}"),
         }
     }
 }
 
-impl core::error::Error for AutodiffResponseError {}
+impl<E: core::error::Error + 'static> core::error::Error for AutodiffResponseError<E> {
+    fn source(&self) -> Option<&(dyn core::error::Error + 'static)> {
+        match self {
+            Self::Backend(error) => Some(error),
+            Self::EmptyObservation | Self::InvalidDose { .. } => None,
+        }
+    }
+}
