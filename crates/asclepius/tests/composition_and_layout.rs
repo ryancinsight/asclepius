@@ -42,9 +42,8 @@ fn wrappers_are_transparent_and_strategies_are_zero_sized() {
     assert_eq!(size_of::<IndependentInsults<8>>(), 0);
 }
 
-// The allocation-measurement windows (`borrowed_tissue_evaluation_is_allocation_free`,
-// `lazy_temperature_conversion_is_allocation_free`) live in the dedicated
-// `allocation_instrument` test binary: the stats_alloc instrument is
-// process-global, so measuring inside a parallel harness let concurrent
-// tests' bookkeeping allocations leak into the windows and flake the
-// zero-allocation assertions.
+// The allocation-measurement windows (`borrowed_tissue_window`,
+// `lazy_temperature_window`) live in the dedicated
+// `allocation_instrument` test binary: its global allocator is the
+// mnemosyne per-thread counting wrapper, so the windows measure the
+// response law's traffic and nothing else the process allocates.
