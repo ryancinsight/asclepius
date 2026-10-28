@@ -14,8 +14,12 @@ bounds are inclusive: a perfectly deterministic outcome (`0.0` or `1.0`) is a
 valid probability. Non-finite values and values outside the interval are
 rejected with `InvalidValue`:
 
-```rust,ignore
-let tcp = Probability::<f64>::new(0.75)?;
+```rust
+extern crate asclepius;
+
+use asclepius::Probability;
+
+let tcp = Probability::<f64>::new(0.75).expect("valid probability");
 assert!(Probability::<f64>::new(0.0).is_ok());
 assert!(Probability::<f64>::new(1.0).is_ok());
 assert!(Probability::<f64>::new(1.1).is_err());
@@ -32,11 +36,15 @@ models. The type distinction prevents passing Niemierko `gamma50` where Lyman
 `m` is required. Both reject their non-positive degenerate cases at
 construction:
 
-```rust,ignore
-let a_parallel = VolumeEffect::<f64>::new(1.0)?;   // parallel (mean-like)
-let a_serial = VolumeEffect::<f64>::new(-16.0)?;   // serial (min-like)
-let gamma50 = Gamma50::<f64>::new(4.0)?;
-let m = LymanSlope::<f64>::new(0.15)?;
+```rust
+extern crate asclepius;
+
+use asclepius::{Gamma50, LymanSlope, VolumeEffect};
+
+let a_parallel = VolumeEffect::<f64>::new(1.0).expect("non-zero");   // parallel (mean-like)
+let a_serial = VolumeEffect::<f64>::new(-16.0).expect("non-zero");   // serial (min-like)
+let gamma50 = Gamma50::<f64>::new(4.0).expect("positive gamma");
+let m = LymanSlope::<f64>::new(0.15).expect("positive slope");
 assert!(VolumeEffect::<f64>::new(0.0).is_err());
 assert!(Gamma50::<f64>::new(-1.0).is_err());
 assert!(LymanSlope::<f64>::new(-1.0).is_err());

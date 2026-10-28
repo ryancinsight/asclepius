@@ -18,6 +18,8 @@ coeus-autograd = { version = "0.12.0", git = "https://github.com/ryancinsight/Co
 coeus-core = { version = "0.12.0", git = "https://github.com/ryancinsight/Coeus.git" }
 coeus-ops = { version = "0.12.0", git = "https://github.com/ryancinsight/Coeus.git", default-features = false }
 coeus-tensor = { version = "0.12.0", git = "https://github.com/ryancinsight/Coeus.git" }
+eunomia = { version = "0.11.0", git = "https://github.com/ryancinsight/eunomia", default-features = false }
+leto-ops = { version = "0.46.5", git = "https://github.com/ryancinsight/leto.git" }
 
 [dev-dependencies]
 aequitas = { version = "0.3.0", git = "https://github.com/ryancinsight/aequitas" }

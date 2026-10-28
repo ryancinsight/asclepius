@@ -18,6 +18,16 @@ use super::validation;
 /// `m TD50 > 0` and the standard normal density is positive, the chain-rule
 /// derivative of NTCP with respect to dose is positive. The CDF range proves
 /// `0 <= NTCP <= 1`.
+///
+/// # Reference
+///
+/// Lyman, "Complication probability as assessed from dose-volume histograms,"
+/// *Radiation Research Supplement* 8, S13-S19
+/// ([PMID 3867079](https://pubmed.ncbi.nlm.nih.gov/3867079/)), with the
+/// Kutcher-Burman non-uniform-volume reduction in Kutcher and Burman,
+/// "Calculation of complication probability factors for non-uniform normal
+/// tissue irradiation: the effective volume method," *IJROBP* 16, 1623-1630
+/// ([DOI 10.1016/0360-3016(89)90972-3](https://doi.org/10.1016/0360-3016(89)90972-3)).
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub struct LymanComplicationProbability<T> {
     midpoint: AbsorbedDose<T>,

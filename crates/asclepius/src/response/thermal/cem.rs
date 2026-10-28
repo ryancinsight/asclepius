@@ -13,23 +13,32 @@ use crate::{
 
 use super::{TemperatureHistory, UniformTemperatureObservation};
 
-/// Cumulative equivalent minutes at 43 degrees Celsius.
+/// Cumulative equivalent exposure at 43 degrees Celsius.
 ///
 /// For reference temperature `T_ref`, uniform step `dt`, and compensation
 /// factor `R(T)`, the discrete exposure is
-/// `sum dt R(T_i)^(T_ref - T_i)`.
+/// `sum dt R(T_i)^(T_ref - T_i)`. The result is an [`EquivalentExposure`],
+/// which stores **canonical SI time (seconds)**; the conventional CEM43 in
+/// equivalent minutes is that value divided by 60.
 ///
 /// # Theorem: canonical reference cases
 ///
 /// With `T_ref = 43 C`, `R = 0.5` at and above the reference, and `R = 0.25`
-/// below it, one minute at 43 C contributes one equivalent minute, one minute
-/// at 44 C contributes two, and one minute at 42 C contributes one quarter.
+/// below it, one elapsed minute at 43 C contributes one equivalent minute
+/// (60 s), one at 44 C contributes two (120 s), and one at 42 C contributes one
+/// quarter (15 s). The dimensionless *rate* is 1, 2 and 0.25 respectively.
 ///
 /// # Theorem: monotonic accumulation
 ///
 /// `dt > 0` and `0 < R <= 1` make every exponential factor and increment
 /// positive. Cumulative equivalent exposure is therefore non-negative and
 /// non-decreasing.
+///
+/// # Reference
+///
+/// Sapareto and Dewey, "Thermal dose determination in cancer therapy,"
+/// *IJROBP* 10, 787-800
+/// ([PMID 6547421](https://pubmed.ncbi.nlm.nih.gov/6547421/)).
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub struct Cem43<T> {
     reference: ThermodynamicTemperature<T>,
