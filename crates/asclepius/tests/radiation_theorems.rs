@@ -148,7 +148,10 @@ fn geud_matches_precision_independent_oracle() {
     let model =
         GeneralizedEquivalentUniformDose::new(VolumeEffect::new(exponent).expect("non-zero"));
     let actual = model.evaluate(&typed).expect("valid sample").into_base();
-    let oracle = 9.929_312_846_564_929_f64;
+    // Binary64 rounding of 9.92931284656492885177... (trailing digits above are
+    // not representable; the full-precision source is pinned in the doc
+    // comment above).
+    let oracle = 9.929_312_846_564_93_f64;
     let bound = 64.0 * f64::EPSILON * oracle;
     assert!(
         (actual - oracle).abs() <= bound,
