@@ -22,18 +22,21 @@ make the denominator at least one, so `0 <= TCP <= 1`, and at `D = D50` the
 ratio is one so `TCP = 1/2`. The law is monotone increasing in dose for
 `D > 0`.
 
-The following is a focused, non-standalone API fragment:
+```rust
+extern crate aequitas;
+extern crate asclepius;
 
-```rust,ignore
 use aequitas::systems::si::{quantities::AbsorbedDose, units::Gray};
 use asclepius::response::radiation::LogisticControlProbability;
 use asclepius::{BiologicalResponse, Gamma50};
 
 let tcp = LogisticControlProbability::new(
     AbsorbedDose::from_unit::<Gray>(50.0),
-    Gamma50::new(2.0)?,
-)?
-.evaluate(AbsorbedDose::from_unit::<Gray>(60.0))?;
+    Gamma50::new(2.0).expect("positive gamma"),
+)
+.expect("positive midpoint")
+.evaluate(AbsorbedDose::from_unit::<Gray>(60.0))
+.expect("valid dose");
 assert!(tcp.get() > 0.5); // above the midpoint dose
 ```
 
@@ -52,16 +55,21 @@ where `TD50` is the 50% complication dose and `m` is the normalized slope. At
 normal density is positive, NTCP is monotone increasing in dose and its CDF
 range proves `0 <= NTCP <= 1`.
 
-```rust,ignore
+```rust
+extern crate aequitas;
+extern crate asclepius;
+
 use aequitas::systems::si::{quantities::AbsorbedDose, units::Gray};
 use asclepius::response::radiation::LymanComplicationProbability;
 use asclepius::{BiologicalResponse, LymanSlope};
 
 let ntcp = LymanComplicationProbability::new(
     AbsorbedDose::from_unit::<Gray>(45.0),
-    LymanSlope::new(0.15)?,
-)?
-.evaluate(AbsorbedDose::from_unit::<Gray>(40.0))?;
+    LymanSlope::new(0.15).expect("positive slope"),
+)
+.expect("positive midpoint")
+.evaluate(AbsorbedDose::from_unit::<Gray>(40.0))
+.expect("valid dose");
 assert!(ntcp.get() < 0.5); // below the midpoint dose
 ```
 

@@ -69,6 +69,43 @@ fn cumulative_cem_and_arrhenius_outputs_are_monotone() {
     assert!((damage[1].get() - expected).abs() <= rounding);
 }
 
+/// Henriques-Moritz epidermal-injury kinetics at a physiological temperature
+/// (ASC-VER-011).
+///
+/// The `A = 2, Ea = 1, R = 1` oracle elsewhere in this file exercises the
+/// algebra at `T = 1 K`; this case pins published kinetic parameters at
+/// hyperthermia temperature instead: `A = 3.1e98 s^-1` with
+/// `Ea = 627.6 kJ/mol` (Henriques & Moritz 1947, cutaneous burns) evaluated
+/// at `T = 317.15 K` (44 C) with `R = 8.314462618 J/(mol K)`. The reference
+/// rate `1.3414998998367949e-05 s^-1` is independently evaluated
+/// (`CPython` `math`: `3.1e98 * exp(-627600/(8.314462618 * 317.15))`).
+/// A Celsius/Kelvin mix-up at the boundary (`T = 44` instead of `317.15`)
+/// underflows to exactly `0.0`, and a molar/gas-constant mix-up is
+/// comparably far off, so the bound below fails on either unit slip.
+///
+/// Bound derivation: the rate's relative error is the absolute error of the
+/// exponent `x = Ea/(R T) ~= 238`; the quotient carries a few ulps, so
+/// `|dk/k| ~= |dx| ~= 238 * 3 * EPSILON ~= 1.6e-13`. `1e-12` relative covers
+/// that with margin.
+#[test]
+fn arrhenius_matches_published_kinetics_at_hyperthermia() {
+    let law = ArrheniusDamage::new(
+        ReciprocalTime::from_unit::<PerSecond>(3.1e98),
+        MolarEnergy::from_unit::<JoulePerMole>(627_600.0),
+        MolarHeatCapacity::from_unit::<JoulePerMoleKelvin>(8.314_462_618),
+    )
+    .expect("positive parameters");
+    let actual = law
+        .rate(kelvin(317.15))
+        .expect("physiological temperature is valid")
+        .into_base();
+    let expected = 1.341_499_899_836_794_9e-5;
+    assert!(
+        (actual - expected).abs() <= 1e-12 * expected,
+        "actual={actual:e}, expected={expected:e}"
+    );
+}
+
 #[test]
 fn survival_and_kill_are_complements() {
     let damage = DamageIntegral::new(1.0_f64).expect("non-negative");

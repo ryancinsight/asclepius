@@ -126,6 +126,8 @@ dependencies = [
  "coeus-core",
  "coeus-ops",
  "coeus-tensor",
+ "eunomia",
+ "leto-ops",
 ]
 
 [[package]]

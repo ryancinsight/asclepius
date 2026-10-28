@@ -26,6 +26,17 @@ use super::validation;
 /// `gEUD(c D) = c gEUD(D)`. The implementation performs this factorization
 /// explicitly by normalizing with the maximum dose for positive `a` and the
 /// minimum dose for negative `a`.
+///
+/// # Reference
+///
+/// Niemierko, "Reporting and analyzing dose distributions: A concept of
+/// equivalent uniform dose," *Medical Physics* 24, 103-110
+/// ([DOI 10.1118/1.598063](https://doi.org/10.1118/1.598063)); generalized in
+/// Niemierko, "A generalized concept of equivalent uniform dose (EUD),"
+/// *Medical Physics* 26, 1100 (AAPM 1999 abstract). See also AAPM Task Group
+/// 166, *The Use and QA of Biologically Related Models for Treatment
+/// Planning*, sections II.F and IV
+/// ([Report 166](https://www.aapm.org/pubs/reports/rpt_166.pdf)).
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub struct GeneralizedEquivalentUniformDose<T> {
     volume_effect: VolumeEffect<T>,

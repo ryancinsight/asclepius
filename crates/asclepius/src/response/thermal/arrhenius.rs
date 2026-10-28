@@ -25,6 +25,16 @@ use super::{TemperatureHistory, UniformTemperatureObservation};
 /// First-order loss obeys `dS/dt = -k(t) S`. Separating variables and
 /// integrating gives `S(t)/S(0) = exp(-Omega(t))`; cell-death probability is
 /// consequently `1 - exp(-Omega)`.
+///
+/// # Reference
+///
+/// Henriques and Moritz, "Studies of Thermal Injury: I," *American Journal of
+/// Pathology* 23, 530-549
+/// ([PMID 19970945](https://pubmed.ncbi.nlm.nih.gov/19970945/)). For model
+/// scope and limits in the 43-50 C hyperthermia range see Pearce,
+/// "Comparative analysis of mathematical models of cell death and thermal
+/// damage processes," *IJH* 29, 262-280
+/// ([DOI 10.3109/02656736.2013.786140](https://doi.org/10.3109/02656736.2013.786140)).
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub struct ArrheniusDamage<T> {
     frequency_factor: ReciprocalTime<T>,

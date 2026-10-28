@@ -18,6 +18,15 @@ use super::validation;
 /// `0 <= TCP <= 1`. At `D = D50`, the ratio is one and `TCP = 1/2`.
 /// Differentiating for `D > 0` gives a positive derivative, so TCP is monotone
 /// increasing in dose.
+///
+/// # Reference
+///
+/// The EUD-based logistic TCP form is Gay and Niemierko, "A free program for
+/// calculating EUD-based NTCP and TCP in external beam radiotherapy,"
+/// *Physica Medica* 23, 115-125
+/// ([DOI 10.1016/j.ejmp.2007.07.001](https://doi.org/10.1016/j.ejmp.2007.07.001)).
+/// See also AAPM Task Group 166, sections II.F and IV
+/// ([Report 166](https://www.aapm.org/pubs/reports/rpt_166.pdf)).
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub struct LogisticControlProbability<T> {
     midpoint: AbsorbedDose<T>,

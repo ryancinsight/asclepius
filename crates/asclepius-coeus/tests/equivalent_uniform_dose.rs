@@ -173,6 +173,61 @@ fn sequential_gradient_matches_independent_central_difference() {
     assert_central_difference_contract::<SequentialBackend>();
 }
 
+/// The `f32` tape shares the scalar-generic construction (ASC-ARCH-017):
+/// value matches the `f32` law core and the reverse-mode gradient matches the
+/// analytic power-mean gradient, both within `f32` ulp bounds.
+fn assert_f32_contract<B>()
+where
+    B: BackendOps<f32> + Default,
+    B::DeviceBuffer<f32>: CpuAddressableStorage<f32> + CpuAddressableStorageMut<f32>,
+{
+    let doses = [40.0_f32, 50.0, 60.0];
+    let exponent = VolumeEffect::new(2.5_f32).expect("fixture exponent is non-zero");
+    let variable = Var::<f32, B>::new(
+        Tensor::from_slice([doses.len()], &doses).expect("fixture shape matches data"),
+        true,
+    )
+    .expect("fixture gradient buffer allocation succeeds");
+    let response = generalized_equivalent_uniform_dose(&variable, exponent)
+        .expect("fixture doses satisfy the response domain");
+
+    let typed_doses = doses.map(AbsorbedDose::from_base);
+    let oracle = GeneralizedEquivalentUniformDose::new(exponent)
+        .evaluate(&typed_doses)
+        .expect("fixture doses satisfy the core response domain");
+    let tolerance = 64.0 * f32::EPSILON * oracle.as_base().abs();
+    assert!((response.tensor.as_slice()[0] - oracle.as_base()).abs() <= tolerance);
+
+    sum(&response)
+        .expect("fixture response reduces")
+        .backward()
+        .expect("fixture response supports reverse differentiation");
+    let gradient = variable
+        .grad()
+        .expect("tracked dose variable receives a gradient");
+    let mean_power = doses
+        .iter()
+        .map(|dose| dose.powf(exponent.get()))
+        .sum::<f32>()
+        / 3.0;
+    let expected_scale = mean_power.powf(exponent.get().recip() - 1.0) / 3.0;
+    for (&actual, dose) in gradient.as_slice().iter().zip(doses) {
+        let expected = expected_scale * dose.powf(exponent.get() - 1.0);
+        let gradient_tolerance = 96.0 * f32::EPSILON * expected.abs();
+        assert!((actual - expected).abs() <= gradient_tolerance);
+    }
+}
+
+#[test]
+fn moirai_backend_supports_f32_tapes() {
+    assert_f32_contract::<MoiraiBackend>();
+}
+
+#[test]
+fn sequential_backend_supports_f32_tapes() {
+    assert_f32_contract::<SequentialBackend>();
+}
+
 #[test]
 fn stabilization_preserves_large_finite_doses() {
     let doses = [f64::MAX / 8.0, f64::MAX / 16.0];

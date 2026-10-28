@@ -5,6 +5,12 @@
 - Date: 2026-07-20
 - Revision: 2026-08-13 — split the semantically distinct radiation-response
   parameters into domain-specific types and migrate all in-repository callers.
+- Revision: 2026-10-28 — settle the fractionation scope (ASC-SCOPE-021):
+  single-course laws owned; LQ/BED/EQD2/alpha-beta and the Kutcher-Burman
+  effective-volume reduction out of scope. Evidence: repository-wide search
+  finds no BED/EQD2/LQ implementation or consumer in any Atlas member, and
+  every "LKB" call site is EUD-fed Lyman, never a DVH effective-volume
+  reduction.
 
 ## Context
 
@@ -58,6 +64,21 @@ Create the Asclepius workspace with a pure `asclepius` law crate.
   Holding that scale constant preserves the derivative because
   `s M_a(D/s) = M_a(D)` for every `s > 0`; it avoids a consumer-owned unstable
   reconstruction without differentiating through a maximum/minimum selector.
+- Fractionation scope (settled 2026-10-28, ASC-SCOPE-021). Owned:
+  single-course response laws over delivered dose (gEUD, logistic TCP, Lyman
+  NTCP on scalar or EUD-fed dose, CEM43 accumulation, Arrhenius damage and
+  survival, independent-insult composition) plus their Coeus tape gradients.
+  Out of scope: the linear-quadratic model, BED/EQD2, alpha-beta ratios,
+  fraction-number formalisms, and the Kutcher-Burman effective-volume DVH
+  reduction. Rationale: no Atlas member implements or consumes any of them
+  (verified by repository-wide search 2026-10-28; kwavers "fractionation"
+  hits are histotripsy lesion completeness, an unrelated mechanical
+  concept), thermal fractionation is already covered by CEM43 additivity,
+  and radiotherapy fractionation belongs with a future treatment-planning
+  consumer. Terminology note: "LKB" call sites in this stack (notably
+  `helios-analysis` `ntcp_lkb`) are EUD-fed Lyman evaluations in the
+  Gay-Niemierko pathway, not effective-volume reductions; the label must not
+  be read as claiming the latter.
 
 ## Theorems and proofs
 
@@ -111,6 +132,17 @@ For probabilities `p_i in [0,1]`, every survival factor `1-p_i` lies in
 `[0,1]`. Their product lies in `[0,1]`, so
 `1-product(1-p_i)` is a probability. Its partial derivative with respect to
 any `p_j` is the non-negative product of the remaining survival factors.
+
+### gEUD reverse-mode gradient
+
+With `P = mean((D/s)^a)` for fixed detached scale `s`, the stabilized
+response is `R = s P^(1/a)`. Differentiating at fixed `s`,
+
+`dR/dD_j = s (1/a) P^(1/a - 1) (a D_j^(a-1)/(s^a N))
+        = P^(1/a - 1) D_j^(a-1)/N`.
+
+The Coeus adapter tests assert this closed form against the tape gradient on
+each backend, plus an independent central-difference check.
 
 ## Rejected alternatives
 

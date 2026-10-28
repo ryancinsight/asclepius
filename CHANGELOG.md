@@ -6,6 +6,12 @@ All externally observable changes are recorded here.
 
 ### Fixed
 
+- State the CEM43 output unit explicitly. `EquivalentExposure` stores canonical
+  SI time (seconds), so the conventional equivalent-minute value is the
+  returned exposure divided by 60. The `Cem43` theorem now says one elapsed
+  minute at 43 °C contributes 60 s (one equivalent minute), not one unit of
+  the returned time.
+
 - Ship the full Apache License 2.0 text in `LICENSE-APACHE`. The manifest
   declares `MIT OR Apache-2.0`, but the file held only the short-form notice,
   so published packages did not include the license terms they offered.

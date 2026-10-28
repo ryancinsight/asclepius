@@ -4,6 +4,10 @@
 //! Consumer packages retain imaging, dose-volume storage, voxel grids,
 //! treatment planning, and device execution.
 
+//! The repository README (usage example included) is part of the crate
+//! documentation so its `rust` fences run under `cargo test --doc`
+//! (ASC-DOC-019): a stale example fails the gate instead of drifting.
+#![doc = include_str!("../../../README.md")]
 #![no_std]
 #![forbid(unsafe_code)]
 #![deny(missing_docs)]

@@ -57,6 +57,47 @@ fn assert_radiation_laws<T: RealField>() {
     let ntcp = LymanComplicationProbability::new(midpoint, m).expect("positive midpoint");
     assert_close(tcp.evaluate(midpoint).expect("valid dose").get(), 0.5, 8.0);
     assert_close(ntcp.evaluate(midpoint).expect("valid dose").get(), 0.5, 8.0);
+
+    // Off-midpoint reference values (ASC-VER-010). The midpoint assertions
+    // above hold for any positive parameters; these pin the Niemierko `4`
+    // factor and the Lyman `TD50` normalization instead. Reference values are
+    // independently evaluated (`CPython` `math`): with `D50 = TD50 = 50`,
+    // `gamma50 = 2`, and `m = 0.2`,
+    // `TCP(60) = 1/(1 + (50/60)^8) = 0.8113...`,
+    // `TCP(40) = 1/(1 + (50/40)^8) = 0.1436...`,
+    // `NTCP(60) = Phi((60 - 50)/(0.2 * 50)) = Phi(1) = 0.8413...`, and
+    // `NTCP(40) = Phi(-1) = 0.1586...`.
+    // A halved Niemierko factor gives 0.6746/0.2906 and a dropped `TD50`
+    // normalization gives 1.0/0.0, all far outside the bound below, so the
+    // assertions fail under either perturbation.
+    // Bound derivation: one division plus one `powf` (TCP) or one `erfc`
+    // (NTCP) each contribute single-digit ulps; 64 ulps covers the chain in
+    // both supported precisions with margin.
+    let steep = LogisticControlProbability::new(
+        midpoint,
+        Gamma50::new(T::from_f64(2.0)).expect("positive gamma50"),
+    )
+    .expect("positive midpoint");
+    assert_close(
+        steep.evaluate(dose::<T>(60.0)).expect("valid dose").get(),
+        0.811_314_238_293_995_7,
+        64.0,
+    );
+    assert_close(
+        steep.evaluate(dose::<T>(40.0)).expect("valid dose").get(),
+        0.143_668_573_157_284_37,
+        64.0,
+    );
+    assert_close(
+        ntcp.evaluate(dose::<T>(60.0)).expect("valid dose").get(),
+        0.841_344_746_068_542_8,
+        64.0,
+    );
+    assert_close(
+        ntcp.evaluate(dose::<T>(40.0)).expect("valid dose").get(),
+        0.158_655_253_931_457_13,
+        64.0,
+    );
     assert!(
         tcp.evaluate(dose::<T>(40.0)).expect("valid").get()
             < tcp.evaluate(dose::<T>(60.0)).expect("valid").get()
@@ -86,6 +127,33 @@ fn geud_matches_independent_legacy_formula() {
         (doses.iter().map(|dose| dose.powf(exponent)).sum::<f64>() / count).powf(exponent.recip());
     let bound = 16.0 * f64::EPSILON * oracle;
     assert!((actual - oracle).abs() <= bound);
+}
+
+/// gEUD against a precision-independent oracle (ASC-VER-013).
+///
+/// The `geud_matches_independent_legacy_formula` case above evaluates the
+/// oracle in binary64 with the same `powf` chain as the implementation, so a
+/// shared libm bias would cancel. This case instead pins the `[2, 4, 8, 16]`
+/// sample at `a = 2.5` against a 50-digit decimal evaluation
+/// (`decimal.Decimal` with `prec = 50`):
+/// `((2^2.5 + 4^2.5 + 8^2.5 + 16^2.5)/4)^(1/2.5)`
+/// `= 9.92931284656492885177...`, which rounds to
+/// `9.929312846564929` in binary64. The implementation's `powf` chain carries
+/// tens of ulps at most; 64 ulps covers it with margin.
+#[test]
+fn geud_matches_precision_independent_oracle() {
+    let doses = [2.0_f64, 4.0, 8.0, 16.0];
+    let exponent = 2.5_f64;
+    let typed = doses.map(AbsorbedDose::from_base);
+    let model =
+        GeneralizedEquivalentUniformDose::new(VolumeEffect::new(exponent).expect("non-zero"));
+    let actual = model.evaluate(&typed).expect("valid sample").into_base();
+    let oracle = 9.929_312_846_564_929_f64;
+    let bound = 64.0 * f64::EPSILON * oracle;
+    assert!(
+        (actual - oracle).abs() <= bound,
+        "actual={actual}, oracle={oracle}, bound={bound}"
+    );
 }
 
 #[test]

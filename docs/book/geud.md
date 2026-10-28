@@ -29,16 +29,18 @@ explicitly — normalizing by the maximum dose for positive `a` and the minimum
 dose for negative `a` — which reduces overflow and underflow relative to
 evaluating `D_i^a` directly.
 
-The following is a focused, non-standalone API fragment:
+```rust
+extern crate aequitas;
+extern crate asclepius;
 
-```rust,ignore
 use aequitas::systems::si::quantities::AbsorbedDose;
 use asclepius::response::radiation::GeneralizedEquivalentUniformDose;
 use asclepius::{BiologicalResponse, VolumeEffect};
 
 let doses = [1.0_f64, 2.0, 3.0, 4.0].map(AbsorbedDose::from_base); // Gy
-let geud = GeneralizedEquivalentUniformDose::new(VolumeEffect::new(1.0)?)
-    .evaluate(doses.as_slice())?;
+let geud = GeneralizedEquivalentUniformDose::new(VolumeEffect::new(1.0).expect("non-zero"))
+    .evaluate(doses.as_slice())
+    .expect("valid sample");
 assert!((*geud.as_base() - 2.5).abs() < 1e-10); // the mean
 ```
 

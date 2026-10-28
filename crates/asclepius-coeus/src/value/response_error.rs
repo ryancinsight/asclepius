@@ -26,12 +26,12 @@ impl fmt::Display for DoseConstraint {
 
 /// Failure to construct a differentiable biological response.
 ///
-/// `E` is the Coeus backend error (`B::Error`) raised while building the
-/// differentiable graph; it defaults to [`coeus_core::BackendError`], the
-/// error of every backend Coeus ships.
+/// `T` is the tape scalar and `E` is the Coeus backend error (`B::Error`)
+/// raised while building the differentiable graph; it defaults to
+/// [`coeus_core::BackendError`], the error of every backend Coeus ships.
 #[derive(Clone, Debug, PartialEq)]
 #[non_exhaustive]
-pub enum AutodiffResponseError<E = coeus_core::BackendError> {
+pub enum AutodiffResponseError<T, E = coeus_core::BackendError> {
     /// The dose observation contains no elements.
     EmptyObservation,
     /// A dose element violates the model domain.
@@ -39,7 +39,7 @@ pub enum AutodiffResponseError<E = coeus_core::BackendError> {
         /// Logical flat index of the offending dose.
         index: usize,
         /// Offending dose value.
-        value: f64,
+        value: T,
         /// Required domain constraint.
         constraint: DoseConstraint,
     },
@@ -47,13 +47,13 @@ pub enum AutodiffResponseError<E = coeus_core::BackendError> {
     Backend(E),
 }
 
-impl<E> From<E> for AutodiffResponseError<E> {
+impl<T, E> From<E> for AutodiffResponseError<T, E> {
     fn from(error: E) -> Self {
         Self::Backend(error)
     }
 }
 
-impl<E: fmt::Display> fmt::Display for AutodiffResponseError<E> {
+impl<T: fmt::Display, E: fmt::Display> fmt::Display for AutodiffResponseError<T, E> {
     fn fmt(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             Self::EmptyObservation => formatter.write_str("dose observation must not be empty"),
@@ -70,7 +70,9 @@ impl<E: fmt::Display> fmt::Display for AutodiffResponseError<E> {
     }
 }
 
-impl<E: core::error::Error + 'static> core::error::Error for AutodiffResponseError<E> {
+impl<T: fmt::Debug + fmt::Display, E: core::error::Error + 'static> core::error::Error
+    for AutodiffResponseError<T, E>
+{
     fn source(&self) -> Option<&(dyn core::error::Error + 'static)> {
         match self {
             Self::Backend(error) => Some(error),

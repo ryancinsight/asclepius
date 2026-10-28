@@ -7,7 +7,8 @@ use super::{InvalidValue, ValueKind, validation};
 ///
 /// The inner Aequitas time quantity preserves the time dimension while this
 /// transparent newtype separates biological equivalent exposure from wall
-/// time.
+/// time. Its canonical unit is seconds: the conventional CEM43 in equivalent
+/// minutes is `get().into_base() / 60`.
 #[derive(Clone, Copy, Debug, PartialEq, PartialOrd)]
 #[repr(transparent)]
 pub struct EquivalentExposure<T>(Time<T>);
