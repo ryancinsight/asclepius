@@ -73,6 +73,97 @@ fn radiation_laws_hold_for_supported_real_scalars() {
     assert_radiation_laws::<f64>();
 }
 
+/// Fixed relative-error budget, in units of `T::EPSILON`, of the logistic
+/// control law evaluated at integer `k = 4 gamma50`.
+///
+/// Terms: `powf` at most one unit; `1 + r` and the reciprocal half a unit
+/// each; rounding of the expected value to `T` half a unit; the `f64` oracle
+/// (exact `powi`, one addition, one division) one unit. The relative error of
+/// `r = (D50/D)^k` is amplified by `r/(1+r) < 1`, and the division `D50/D`
+/// contributes `k/2` units after exponentiation. The budget is `k/2 + 4`.
+const CONTROL_FIXED_UNITS: f64 = 4.0;
+
+/// Niemierko control probability for integer `k = 4 gamma50`, written as
+/// `D^k / (D^k + D50^k)`, the rearrangement of `1 / (1 + (D50/D)^k)` that
+/// involves no division before the final one. `powi` is exact here because
+/// every `D^k` is an integer below `2^53`.
+fn niemierko_control(midpoint: f64, dose: f64, exponent: i32) -> f64 {
+    let dose_power = dose.powi(exponent);
+    dose_power / (dose_power + midpoint.powi(exponent))
+}
+
+fn assert_control_probability_off_midpoint<T: RealField>() {
+    let midpoint = 50.0;
+    // (gamma50, 4 gamma50, dose): distinct exponents 1, 2, 8 separate the
+    // factor 4 from any other multiple of gamma50.
+    let cases = [
+        (0.25, 1, 40.0),
+        (0.5, 2, 40.0),
+        (0.5, 2, 60.0),
+        (2.0, 8, 40.0),
+        (2.0, 8, 60.0),
+    ];
+    for (gamma50, exponent, dose_value) in cases {
+        let law = LogisticControlProbability::new(
+            dose::<T>(midpoint),
+            Gamma50::new(T::from_f64(gamma50)).expect("positive gamma50"),
+        )
+        .expect("positive midpoint");
+        let actual = law
+            .evaluate(dose::<T>(dose_value))
+            .expect("valid dose")
+            .get();
+        let units = f64::from(exponent) / 2.0 + CONTROL_FIXED_UNITS;
+        assert_close(
+            actual,
+            niemierko_control(midpoint, dose_value, exponent),
+            units,
+        );
+    }
+}
+
+/// Relative-error budget, in units of `T::EPSILON`, of the Lyman law at
+/// `t = (D - TD50)/(m TD50)` with `|t| <= 2`.
+///
+/// The argument `x = -t/sqrt(2)` carries two roundings (the constant and the
+/// product), one unit. `erfc` amplifies a relative argument error by
+/// `|x| (2/sqrt(pi)) exp(-x^2) / erfc(x)`, which is `1.52` at `t = -1` and
+/// smaller at `t = 1` and `t = 2`. The `libm` `erfc` is budgeted at two units
+/// and the rounded expected value at half a unit: `1.52 + 2 + 0.5`, rounded
+/// up to five. `t` is exact because `D - TD50`, `m TD50`, and their quotient
+/// are representable in every supported scalar for the fixtures below.
+const NORMAL_CDF_UNITS: f64 = 5.0;
+
+fn assert_complication_probability_off_midpoint<T: RealField>() {
+    let midpoint = 40.0;
+    let m = LymanSlope::new(T::from_f64(0.25)).expect("positive Lyman slope");
+    let law = LymanComplicationProbability::new(dose::<T>(midpoint), m).expect("positive midpoint");
+    // m TD50 = 10 Gy, so t = (D - 40)/10. Expected values are the standard
+    // normal CDF at t = 1, -1, 2, evaluated from its Maclaurin series
+    // `1/2 + (1/sqrt(2 pi)) sum_n (-1)^n t^(2n+1) / (2^n n! (2n+1))` in
+    // 40-digit decimal arithmetic, independent of `erfc`.
+    let cases = [
+        (50.0, 0.841_344_746_068_542_9),
+        (30.0, 0.158_655_253_931_457_05),
+        (60.0, 0.977_249_868_051_820_8),
+    ];
+    for (dose_value, expected) in cases {
+        let actual = law
+            .evaluate(dose::<T>(dose_value))
+            .expect("valid dose")
+            .get();
+        assert_close(actual, expected, NORMAL_CDF_UNITS);
+    }
+}
+
+#[test]
+fn control_and_complication_match_closed_forms_off_midpoint() {
+    assert_control_probability_off_midpoint::<f32>();
+    assert_control_probability_off_midpoint::<f64>();
+    assert_complication_probability_off_midpoint::<f32>();
+    assert_complication_probability_off_midpoint::<f64>();
+}
+
 #[test]
 fn geud_matches_independent_legacy_formula() {
     let doses = [2.0_f64, 4.0, 8.0, 16.0];

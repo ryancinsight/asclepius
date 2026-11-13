@@ -51,10 +51,6 @@ on it, and so that book items wait for the in-flight book CI branch.
       `LogisticControlProbability`, `LymanComplicationProbability`, `Cem43`,
       `ArrheniusDamage`, and the Coeus adapter. The sources exist only in
       README.md today.
-- [ ] ASC-VER-010: add off-midpoint TCP and NTCP reference cases. Confirm the
-      new assertions fail when the Niemierko `4` factor or the Lyman `TD50`
-      normalization is perturbed, since every current assertion holds for any
-      positive parameter value.
 - [ ] ASC-VER-013: add a Niemierko or TG-166 worked gEUD value as an
       independent oracle beside the existing same-formula differential test.
 - [ ] ASC-VER-011: add an Arrhenius case with published kinetic parameters at
