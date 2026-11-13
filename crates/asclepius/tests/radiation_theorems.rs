@@ -73,86 +73,124 @@ fn radiation_laws_hold_for_supported_real_scalars() {
     assert_radiation_laws::<f64>();
 }
 
-/// Fixed relative-error budget, in units of `T::EPSILON`, of the logistic
-/// control law evaluated at integer `k = 4 gamma50`.
+/// Maximum relative error of one correctly rounded IEEE 754 operation in
+/// round-to-nearest, in units of `T::EPSILON`: the unit roundoff `u = EPSILON / 2`.
+const ROUNDING_UNITS: f64 = 0.5;
+
+/// Roundings common to every control case: the sum `1 + r`, the reciprocal,
+/// the rounding of the expected value to `T` in `assert_close`, and the one
+/// division of the `f64` oracle (its numerator and denominator are exact).
+const CONTROL_COMMON_ROUNDINGS: u32 = 4;
+
+/// Roundings in `r = (D50/D)^k` for the exponents `k` used below.
 ///
-/// Terms: `powf` at most one unit; `1 + r` and the reciprocal half a unit
-/// each; rounding of the expected value to `T` half a unit; the `f64` oracle
-/// (exact `powi`, one addition, one division) one unit. The relative error of
-/// `r = (D50/D)^k` is amplified by `r/(1+r) < 1`, and the division `D50/D`
-/// contributes `k/2` units after exponentiation. The budget is `k/2 + 4`.
-const CONTROL_FIXED_UNITS: f64 = 4.0;
-
-/// Niemierko control probability for integer `k = 4 gamma50`, written as
-/// `D^k / (D^k + D50^k)`, the rearrangement of `1 / (1 + (D50/D)^k)` that
-/// involves no division before the final one. `powi` is exact here because
-/// every `D^k` is an integer below `2^53`.
-fn niemierko_control(midpoint: f64, dose: f64, exponent: i32) -> f64 {
-    let dose_power = dose.powi(exponent);
-    dose_power / (dose_power + midpoint.powi(exponent))
-}
-
-fn assert_control_probability_off_midpoint<T: RealField>() {
-    let midpoint = 50.0;
-    // (gamma50, 4 gamma50, dose): distinct exponents 1, 2, 8 separate the
-    // factor 4 from any other multiple of gamma50.
-    let cases = [
-        (0.25, 1, 40.0),
-        (0.5, 2, 40.0),
-        (0.5, 2, 60.0),
-        (2.0, 8, 40.0),
-        (2.0, 8, 60.0),
-    ];
-    for (gamma50, exponent, dose_value) in cases {
-        let law = LogisticControlProbability::new(
-            dose::<T>(midpoint),
-            Gamma50::new(T::from_f64(gamma50)).expect("positive gamma50"),
-        )
-        .expect("positive midpoint");
-        let actual = law
-            .evaluate(dose::<T>(dose_value))
-            .expect("valid dose")
-            .get();
-        let units = f64::from(exponent) / 2.0 + CONTROL_FIXED_UNITS;
-        assert_close(
-            actual,
-            niemierko_control(midpoint, dose_value, exponent),
-            units,
-        );
+/// `libm` evaluates `powf(x, 1)` as `x` and `powf(x, 2)` as `x * x`
+/// (libm 0.2.16 `pow.rs` lines 170 and 175, `powf.rs` lines 129 and 134), so
+/// `k = 1` carries the one rounding of the quotient `D50/D`, and `k = 2`
+/// carries it twice (it is squared) plus the rounding of the product. No
+/// accuracy figure for `libm` enters.
+fn power_roundings(exponent: u32) -> u32 {
+    match exponent {
+        1 => 1,
+        2 => 3,
+        other => panic!("exponent {other} has no exact libm special case"),
     }
 }
 
-/// Relative-error budget, in units of `T::EPSILON`, of the Lyman law at
-/// `t = (D - TD50)/(m TD50)` with `|t| <= 2`.
+/// Relative error budget, in units of `T::EPSILON`, of the logistic control
+/// law at integer exponent `k = 4 gamma50` in `{1, 2}`.
 ///
-/// The argument `x = -t/sqrt(2)` carries two roundings (the constant and the
-/// product), one unit. `erfc` amplifies a relative argument error by
-/// `|x| (2/sqrt(pi)) exp(-x^2) / erfc(x)`, which is `1.52` at `t = -1` and
-/// smaller at `t = 1` and `t = 2`. The `libm` `erfc` is budgeted at two units
-/// and the rounded expected value at half a unit: `1.52 + 2 + 0.5`, rounded
-/// up to five. `t` is exact because `D - TD50`, `m TD50`, and their quotient
-/// are representable in every supported scalar for the fixtures below.
-const NORMAL_CDF_UNITS: f64 = 5.0;
+/// The computed value is `fl(1 / fl(1 + r))` with `r` carrying
+/// `power_roundings` roundings. A relative error `theta` in `r` moves
+/// `1 + r` by at most `theta r / (1 + r) < theta`, so every rounding in the
+/// chain contributes at most `u`, and the budget is the count of roundings
+/// times `ROUNDING_UNITS`: `(power_roundings + CONTROL_COMMON_ROUNDINGS) / 2`.
+/// Products of at most seven factors `1 + delta` with `|delta| <= u`
+/// differ from first order by under `10^-5` units for `f32` and `f64`.
+/// `assert_close` scales by `max(|expected|, 1) = 1`, while every expected
+/// value below is under `0.7`, so the absolute bound exceeds the relative
+/// budget by a factor above `1.4`, which dominates that second-order term.
+fn control_units(exponent: u32) -> f64 {
+    f64::from(power_roundings(exponent) + CONTROL_COMMON_ROUNDINGS) * ROUNDING_UNITS
+}
 
-fn assert_complication_probability_off_midpoint<T: RealField>() {
-    let midpoint = 40.0;
-    let m = LymanSlope::new(T::from_f64(0.25)).expect("positive Lyman slope");
-    let law = LymanComplicationProbability::new(dose::<T>(midpoint), m).expect("positive midpoint");
-    // m TD50 = 10 Gy, so t = (D - 40)/10. Expected values are the standard
-    // normal CDF at t = 1, -1, 2, evaluated from its Maclaurin series
-    // `1/2 + (1/sqrt(2 pi)) sum_n (-1)^n t^(2n+1) / (2^n n! (2n+1))` in
-    // 40-digit decimal arithmetic, independent of `erfc`.
-    let cases = [
-        (50.0, 0.841_344_746_068_542_9),
-        (30.0, 0.158_655_253_931_457_05),
-        (60.0, 0.977_249_868_051_820_8),
-    ];
-    for (dose_value, expected) in cases {
-        let actual = law
-            .evaluate(dose::<T>(dose_value))
-            .expect("valid dose")
-            .get();
-        assert_close(actual, expected, NORMAL_CDF_UNITS);
+/// Niemierko control probability for integer `k = 4 gamma50`, written as
+/// `D^k / (D^k + D50^k)`, the rearrangement of `1 / (1 + (D50/D)^k)` that
+/// involves no division before the final one. The powers are repeated
+/// products of integers below `2^53`, hence exact, as is their sum.
+fn niemierko_control(midpoint: f64, dose: f64, exponent: u32) -> f64 {
+    let power = |base: f64| (0..exponent).fold(1.0, |product, _| product * base);
+    let dose_power = power(dose);
+    dose_power / (dose_power + power(midpoint))
+}
+
+fn assert_control_probability_off_midpoint<T: RealField>() {
+    // (D50, doses): two midpoints so a constant-D50 mutant fails.
+    let midpoints = [(50.0, [40.0, 60.0]), (80.0, [60.0, 100.0])];
+    // (gamma50, 4 gamma50): both products are exact, and the exponent
+    // differs per gamma50, so a factor other than 4 changes k and the value.
+    let slopes = [(0.25, 1), (0.5, 2)];
+    for (midpoint, doses) in midpoints {
+        for (gamma50, exponent) in slopes {
+            let law = LogisticControlProbability::new(
+                dose::<T>(midpoint),
+                Gamma50::new(T::from_f64(gamma50)).expect("positive gamma50"),
+            )
+            .expect("positive midpoint");
+            for dose_value in doses {
+                let actual = law
+                    .evaluate(dose::<T>(dose_value))
+                    .expect("valid dose")
+                    .get();
+                assert_close(
+                    actual,
+                    niemierko_control(midpoint, dose_value, exponent),
+                    control_units(exponent),
+                );
+            }
+        }
+    }
+}
+
+/// Checks the Lyman law against `Phi(t) = erfc(-t / sqrt(2)) / 2` evaluated
+/// by the same `erfc` at an exactly known `t = (D - TD50) / (m TD50)`.
+///
+/// The identity follows from the definitions. Substituting `s = sqrt(2) u`
+/// in the standard normal density gives
+/// `Phi(t) = (1/sqrt(pi)) int_{-inf}^{t/sqrt(2)} exp(-u^2) du`. With
+/// `int_{-inf}^{inf} exp(-u^2) du = sqrt(pi)` and
+/// `erf(x) = (2/sqrt(pi)) int_0^x exp(-u^2) du` (libm 0.2.16 `erf.rs` lines
+/// 14-18), `Phi(t) = (1 + erf(t/sqrt(2))) / 2`, which is
+/// `erfc(-t/sqrt(2)) / 2` because `erfc = 1 - erf` (same file, line 21).
+///
+/// Every `D - TD50` and `m TD50` below is a small integer (`m` is a power of
+/// two), so the law's quotient `t` is exactly `-1`, `1` or `2`. The law then
+/// forms `-t * c` with `c = T::from_f64(FRAC_1_SQRT_2)`, a product with `-1`,
+/// `1` or `2` that rounds nothing, so the law and the reference apply `erfc`
+/// to bit-identical arguments and the comparison is exact equality: no
+/// accuracy figure for `erfc` enters, and `erfc` itself is not asserted here.
+fn assert_complication_is_normal_cdf_of_normalized_dose<T: RealField>() {
+    // (TD50, m): m TD50 is 10 Gy and 30 Gy, so a dose maps to a different t
+    // under each fixture and a constant m or TD50 fails one of them.
+    let fixtures = [(40.0, 0.25), (60.0, 0.5)];
+    for (midpoint, slope) in fixtures {
+        let m = LymanSlope::new(T::from_f64(slope)).expect("positive Lyman slope");
+        let law =
+            LymanComplicationProbability::new(dose::<T>(midpoint), m).expect("positive midpoint");
+        let scale = midpoint * slope;
+        for normalized in [-1.0, 1.0, 2.0] {
+            let dose_value = midpoint + normalized * scale;
+            let actual = law
+                .evaluate(dose::<T>(dose_value))
+                .expect("valid dose")
+                .get();
+            let argument = T::from_f64(-normalized) * T::from_f64(core::f64::consts::FRAC_1_SQRT_2);
+            let expected = T::from_f64(0.5) * argument.erfc();
+            assert_eq!(
+                actual, expected,
+                "dose {dose_value} Gy at TD50 {midpoint} Gy"
+            );
+        }
     }
 }
 
@@ -160,8 +198,8 @@ fn assert_complication_probability_off_midpoint<T: RealField>() {
 fn control_and_complication_match_closed_forms_off_midpoint() {
     assert_control_probability_off_midpoint::<f32>();
     assert_control_probability_off_midpoint::<f64>();
-    assert_complication_probability_off_midpoint::<f32>();
-    assert_complication_probability_off_midpoint::<f64>();
+    assert_complication_is_normal_cdf_of_normalized_dose::<f32>();
+    assert_complication_is_normal_cdf_of_normalized_dose::<f64>();
 }
 
 #[test]
