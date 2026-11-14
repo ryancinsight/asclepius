@@ -10,3 +10,4 @@
 | ADR | Title | Status |
 | --- | ----- | ------ |
 | [0001](0001-biological-response-boundary.md) | Own shared biological response in Asclepius | Accepted |
+| [0002](0002-release-scope-1-0.md) | Asclepius release scope for 1.0 | Accepted |
