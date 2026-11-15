@@ -4,6 +4,16 @@ All externally observable changes are recorded here.
 
 ## Unreleased
 
+### Changed
+
+- Advance the Moirai provider contract from 0.11.4 to 0.12.0 and refresh every
+  first-party lock row onto its repository's current default head. The lock is
+  regenerated outside the Atlas dependency overlay, so the `source = "git+..."`
+  rows survive and the registry rows are unchanged. Moirai 0.12.0 removes the
+  required `StateWord::get_mut` method, which Asclepius neither implements nor
+  calls, and Asclepius re-exports no Moirai or Eunomia type, so the public
+  Asclepius surface is unchanged.
+
 ### Fixed
 
 - Ship the full Apache License 2.0 text in `LICENSE-APACHE`. The manifest
