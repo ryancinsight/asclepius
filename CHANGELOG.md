@@ -6,6 +6,19 @@ All externally observable changes are recorded here.
 
 ### Changed
 
+- Admit Leto 0.50.0 in the lock. Asclepius reaches Leto through Coeus 0.12.0
+  and Apollo 0.29.5, both of which still demand `<0.49.0`, so `Cargo.lock`
+  moves three first-party rows onto their first default-branch revisions whose
+  Leto bounds admit 0.50: Coeus `7e1ded59` (from `5033ec53`), Apollo
+  `b7bffe1c` (from `0c651487`) and Leto `6483eac3` (from `39d65120`), with
+  `leto` and `leto-ops` at 0.50.0. Leto 0.50 removes the `VecStorage::uninit`
+  constructor so it is a breaking change for the provider, but Asclepius calls
+  no `VecStorage` method, owns no Leto or Apollo type in its public surface,
+  and its Coeus adapter imports only `coeus-autograd`, `coeus-core`,
+  `coeus-ops` and `coeus-tensor` items, so no source change is needed. `cargo metadata --locked` resolves the
+  export outside the Atlas dependency overlay, which leaves the lock
+  byte-identical and its git source rows intact.
+
 - Advance the Moirai provider contract from 0.11.4 to 0.12.0 and refresh every
   first-party lock row onto its repository's current default head. The lock is
   regenerated outside the Atlas dependency overlay, so the `source = "git+..."`
