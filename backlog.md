@@ -8,8 +8,9 @@ Asclepius 0.4.0 is published. The registry archive matches the merge
 revision, and a fresh consumer checks the typed response at its exact
 midpoint. [Release evidence](https://github.com/ryancinsight/asclepius/actions/runs/44652256475)
 
-The Coeus adapter first publication [minor] follows indexed Coeus 0.13
-packages and a fresh workspace and package build.
+The Coeus adapter 0.4.0 [minor] is published. A clean registry consumer
+verifies the generalized equivalent uniform dose of 3 Gy and 4 Gy and its
+analytical gradient. [Release](https://github.com/ryancinsight/asclepius/releases/tag/asclepius-coeus-v0.4.0)
 
 Repository-side preflight at provider head `db33cca` passes with `cargo publish
 --manifest-path crates/asclepius/Cargo.toml --package asclepius --locked
