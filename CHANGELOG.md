@@ -4,6 +4,11 @@ All externally observable changes are recorded here.
 
 ## 0.4.0
 
+### Added
+
+- Distribute the Coeus adapter as `asclepius-coeus` with registry
+  Coeus 0.13 and the Asclepius 0.4 response-law crate.
+
 ### Breaking
 
 - Use registry Aequitas 0.4 for public dose, time, and temperature types

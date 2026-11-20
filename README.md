@@ -10,9 +10,10 @@ The name refers to Asclepius, the Greek god of medicine and healing.
 
 Asclepius is developed as a
 [public GitHub repository](https://github.com/ryancinsight/asclepius) and
-published as the [`asclepius`](https://crates.io/crates/asclepius) crate.
-Asclepius 0.4 shares the Aequitas 0.4 quantity types that consumers use at
-the dose, time, and temperature boundaries.
+distributed as [`asclepius`](https://crates.io/crates/asclepius) for response
+laws and [`asclepius-coeus`](https://crates.io/crates/asclepius-coeus) for
+Coeus autodiff. Asclepius 0.4 shares the Aequitas 0.4 quantity types that
+consumers use at the dose, time, and temperature boundaries.
 
 The `Crates.io Release` workflow validates a named workspace package on manual
 dispatch. After the first release establishes the crate and its trusted
