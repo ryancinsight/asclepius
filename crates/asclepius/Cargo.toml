@@ -17,8 +17,10 @@ aequitas = { version = "0.5.0", default-features = false }
 eunomia = { version = "0.12.1", default-features = false }
 
 [dev-dependencies]
-mnemosyne = { package = "mnemosyne-memory", version = "0.10.0", git = "https://github.com/ryancinsight/Mnemosyne", default-features = false }
+mnemosyne = { package = "mnemosyne-memory", version = "0.10.2", default-features = false }
 proptest = "1.11.0"
+tracing = "0.1"
+tracing-subscriber = "0.3"
 
 [features]
 default = ["std"]

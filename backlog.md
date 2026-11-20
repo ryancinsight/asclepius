@@ -2,7 +2,15 @@
 
 | ID | Outcome | Scope / non-goals | Acceptance oracle | Class | Status | Dependencies |
 | --- | --- | --- | --- | --- | --- | --- |
-| ASC-REL-008 | Publish the Asclepius law core through crates.io Trusted Publishing. | `asclepius`, standalone dependency sources, release workflow, and distribution docs; `asclepius-coeus` remains unpublished. | Repository-side exact-source package dry-run passes and the crates.io package identity is indexed; trusted-publishing-only configuration and the matching GitHub Release remain external release-authority actions. | patch | in-progress; milestone: M-1.0 | Aequitas and Eunomia registry releases |
+| ASC-REL-008 | Publish the Asclepius law core through crates.io Trusted Publishing. | `asclepius`, standalone dependency sources, release workflow, and distribution docs. The Coeus adapter follows once its registry graph passes. | Repository-side exact-source package dry-run passes and the crates.io package identity is indexed; trusted-publishing-only configuration and the matching GitHub Release remain external release-authority actions. | patch | done; milestone: M-1.0 | Aequitas and Eunomia registry releases |
+
+Asclepius 0.4.0 is published. The registry archive matches the merge
+revision, and a fresh consumer checks the typed response at its exact
+midpoint. [Release evidence](https://github.com/ryancinsight/asclepius/actions/runs/44652256475)
+
+The Coeus adapter 0.4.0 [minor] is published. A clean registry consumer
+verifies the generalized equivalent uniform dose of 3 Gy and 4 Gy and its
+analytical gradient. [Release](https://github.com/ryancinsight/asclepius/releases/tag/asclepius-coeus-v0.4.0)
 
 Repository-side preflight at provider head `db33cca` passes with `cargo publish
 --manifest-path crates/asclepius/Cargo.toml --package asclepius --locked

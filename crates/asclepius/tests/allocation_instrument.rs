@@ -21,10 +21,12 @@ use asclepius::{
     },
 };
 use std::hint::black_box;
-use std::sync::{Arc, Barrier};
+use std::sync::atomic::{AtomicBool, Ordering};
 use std::thread;
 
 use mnemosyne::counting::{AllocationDelta, CountingAllocator, measure};
+use tracing::info_span;
+use tracing_subscriber::fmt::format::FmtSpan;
 
 #[global_allocator]
 static ALLOCATOR: CountingAllocator<std::alloc::System> =
@@ -89,36 +91,52 @@ fn lazy_temperature_window() {
 /// (`stats_alloc`) would absorb the worker's allocation and fail.
 #[test]
 fn allocations_on_another_thread_are_not_counted() {
-    // `thread::spawn` allocates on the spawning thread, so the worker
-    // starts before the window and the barriers, built before it too,
-    // bracket the worker's allocation without allocating themselves.
-    let start = Arc::new(Barrier::new(2));
-    let done = Arc::new(Barrier::new(2));
-    let worker = {
-        let (start, done) = (Arc::clone(&start), Arc::clone(&done));
-        thread::spawn(move || {
-            start.wait();
-            let ((), own) = measure(|| drop(black_box(Vec::<u8>::with_capacity(1024))));
-            done.wait();
-            own
-        })
-    };
+    let subscriber = tracing_subscriber::fmt()
+        .with_test_writer()
+        .with_span_events(FmtSpan::FULL)
+        .finish();
+    tracing::subscriber::with_default(subscriber, || {
+        let (measure_started, worker_finished) =
+            info_span!("arrange").in_scope(|| (AtomicBool::new(false), AtomicBool::new(false)));
 
-    let ((), observed) = measure(|| {
-        start.wait();
-        done.wait();
+        // Spawning and joining can allocate on the parent thread. Only the
+        // acquire/release handshake runs inside its measurement window.
+        thread::scope(|scope| {
+            let worker = info_span!("arrange").in_scope(|| {
+                scope.spawn(|| {
+                    while !measure_started.load(Ordering::Acquire) {
+                        thread::yield_now();
+                    }
+                    let ((), own) = measure(|| drop(black_box(Vec::<u8>::with_capacity(1024))));
+                    worker_finished.store(true, Ordering::Release);
+                    own
+                })
+            });
+
+            let (observed, worker_delta) = info_span!("act").in_scope(|| {
+                let ((), observed) = measure(|| {
+                    measure_started.store(true, Ordering::Release);
+                    while !worker_finished.load(Ordering::Acquire) {
+                        thread::yield_now();
+                    }
+                });
+                let worker_delta = worker.join().expect("the worker does not panic");
+                (observed, worker_delta)
+            });
+
+            info_span!("assert").in_scope(|| {
+                assert_eq!(observed, AllocationDelta::default(), "foreign thread zero");
+                assert_eq!(
+                    worker_delta,
+                    AllocationDelta {
+                        allocations: 1,
+                        deallocations: 1,
+                        bytes_allocated: 1024,
+                        bytes_deallocated: 1024,
+                        ..AllocationDelta::default()
+                    }
+                );
+            });
+        });
     });
-    let worker_delta = worker.join().expect("the worker does not panic");
-
-    assert_eq!(observed, AllocationDelta::default(), "foreign thread zero");
-    assert_eq!(
-        worker_delta,
-        AllocationDelta {
-            allocations: 1,
-            deallocations: 1,
-            bytes_allocated: 1024,
-            bytes_deallocated: 1024,
-            ..AllocationDelta::default()
-        }
-    );
 }

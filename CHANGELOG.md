@@ -2,6 +2,34 @@
 
 All externally observable changes are recorded here.
 
+## [0.5.0] - Aequitas 0.5 provider migration
+
+### Breaking
+
+- [major] Use Aequitas 0.5 quantities at the response-law boundaries and
+  Coeus 0.14 at the adapter boundary. Consumers must update the quantity
+  and gradient providers together. The biological-response laws retain
+  their existing unit and numerical contracts.
+
+## 0.4.0
+
+### Added
+
+- Distribute the Coeus adapter as `asclepius-coeus` with registry
+  Coeus 0.13 and the Asclepius 0.4 response-law crate.
+
+### Breaking
+
+- Use registry Aequitas 0.4 for public dose, time, and temperature types
+  and Eunomia 0.12.1 for scalar contracts. Update direct Aequitas
+  requirements to 0.4. The Coeus adapter takes Coeus 0.13 tensors.
+
+### Fixed
+
+- Measure foreign-thread allocator activity with an allocation-free
+  handshake. The test still requires the worker to allocate and release
+  1024 bytes while the parent reports zero allocations.
+
 ## Unreleased
 
 ### Changed
