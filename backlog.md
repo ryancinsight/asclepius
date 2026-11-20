@@ -2,10 +2,14 @@
 
 | ID | Outcome | Scope / non-goals | Acceptance oracle | Class | Status | Dependencies |
 | --- | --- | --- | --- | --- | --- | --- |
-| ASC-REL-008 | Publish the Asclepius law core through crates.io Trusted Publishing. | `asclepius`, standalone dependency sources, release workflow, and distribution docs; `asclepius-coeus` remains unpublished. | Repository-side exact-source package dry-run passes and the crates.io package identity is indexed; trusted-publishing-only configuration and the matching GitHub Release remain external release-authority actions. | patch | in-progress; milestone: M-1.0 | Aequitas and Eunomia registry releases |
+| ASC-REL-008 | Publish the Asclepius law core through crates.io Trusted Publishing. | `asclepius`, standalone dependency sources, release workflow, and distribution docs. The Coeus adapter follows once its registry graph passes. | Repository-side exact-source package dry-run passes and the crates.io package identity is indexed; trusted-publishing-only configuration and the matching GitHub Release remain external release-authority actions. | patch | done; milestone: M-1.0 | Aequitas and Eunomia registry releases |
 
-The response-law crate can release on its own. Publish the Coeus adapter
-after Coeus 0.13 is indexed and the adapter passes a fresh registry build.
+Asclepius 0.4.0 is published. The registry archive matches the merge
+revision, and a fresh consumer checks the typed response at its exact
+midpoint. [Release evidence](https://github.com/ryancinsight/asclepius/actions/runs/44652256475)
+
+The Coeus adapter first publication [minor] follows indexed Coeus 0.13
+packages and a fresh workspace and package build.
 
 Repository-side preflight at provider head `db33cca` passes with `cargo publish
 --manifest-path crates/asclepius/Cargo.toml --package asclepius --locked

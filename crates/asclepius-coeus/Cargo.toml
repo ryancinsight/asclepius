@@ -10,14 +10,14 @@ license.workspace = true
 readme = "../../README.md"
 keywords = ["autodiff", "biophysics", "radiobiology", "treatment-response"]
 categories = ["science"]
-publish = false
+publish = true
 
 [dependencies]
 asclepius = { version = "0.4.0", path = "../asclepius" }
-coeus-autograd = { version = "0.13.0", git = "https://github.com/ryancinsight/Coeus.git", default-features = false }
-coeus-core = { version = "0.13.0", git = "https://github.com/ryancinsight/Coeus.git" }
-coeus-ops = { version = "0.13.0", git = "https://github.com/ryancinsight/Coeus.git", default-features = false }
-coeus-tensor = { version = "0.13.0", git = "https://github.com/ryancinsight/Coeus.git" }
+coeus-autograd = { version = "0.13.0", default-features = false }
+coeus-core = { version = "0.13.0" }
+coeus-ops = { version = "0.13.0", default-features = false }
+coeus-tensor = { version = "0.13.0" }
 
 [dev-dependencies]
 aequitas = "0.4.0"

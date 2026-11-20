@@ -2,8 +2,10 @@
 
 ## Current target 0.4.0
 
-- [ ] [major] Verify and publish the Asclepius response-law crate.
-- [ ] [minor] Verify and publish the adapter once Coeus 0.13 reaches crates.io.
+- [x] [major] Verify and publish the Asclepius response-law crate.
+      [Release](https://github.com/ryancinsight/asclepius/releases/tag/crate-asclepius-v0.4.0)
+- [x] [minor] Resolve the registry Coeus 0.13 graph and verify the adapter.
+- [ ] [minor] Publish the adapter and verify a fresh crates.io consumer.
 
 ## ASC-VER-016 — Close CI verification gaps
 
@@ -22,10 +24,8 @@
       asclepius --locked --dry-run` at provider head `db33cca`. Cargo confirms
       the existing crates.io package identity, packages 35 files (95.8 KiB),
       and verifies the package successfully.
-- [ ] Configure and verify the crates.io Trusted Publisher, enable
-      trusted-publishing-only mode, and create the matching GitHub Release.
-      This remains an external release-authority action; repository-side
-      packaging is complete.
+- [x] Verify the 0.4.0 trusted-publisher workflow and release tag.
+      [Workflow](https://github.com/ryancinsight/asclepius/actions/runs/44652256475)
 - [x] Audit current Helios and Kwavers response ownership.
 - [x] Verify primary mathematical sources and model limitations.
 - [x] Add the required Aequitas dimensional vocabulary.
