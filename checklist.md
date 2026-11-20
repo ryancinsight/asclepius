@@ -5,7 +5,8 @@
 - [x] [major] Verify and publish the Asclepius response-law crate.
       [Release](https://github.com/ryancinsight/asclepius/releases/tag/crate-asclepius-v0.4.0)
 - [x] [minor] Resolve the registry Coeus 0.13 graph and verify the adapter.
-- [ ] [minor] Publish the adapter and verify a fresh crates.io consumer.
+- [x] [minor] Publish the adapter and verify a fresh crates.io consumer.
+      [Release](https://github.com/ryancinsight/asclepius/releases/tag/asclepius-coeus-v0.4.0)
 
 ## ASC-VER-016 — Close CI verification gaps
 

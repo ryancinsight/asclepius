@@ -8,6 +8,7 @@
 - The lockfile guard accepts this registry-only graph. A lock generated with
   the actual Eunomia source overlaid as a path fails both the working and
   staged checks.
-- The normalized adapter package builds against the published response-law
-  and Coeus packages. Close publication when crates.io verifies the archive
-  and an independent consumer compiles from an empty lockfile state.
+- The indexed adapter archive records merge 211b5b9ee3b7 and matches the
+  locally verified archive checksum. A registry-only consumer starting with
+  no lockfile checks the response RMS of 3 Gy and 4 Gy and both partial
+  derivatives. [Release](https://github.com/ryancinsight/asclepius/releases/tag/asclepius-coeus-v0.4.0)
