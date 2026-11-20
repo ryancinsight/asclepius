@@ -2,6 +2,20 @@
 
 All externally observable changes are recorded here.
 
+## 0.4.0
+
+### Breaking
+
+- Use registry Aequitas 0.4 for public dose, time, and temperature types
+  and Eunomia 0.12.1 for scalar contracts. Update direct Aequitas
+  requirements to 0.4. The Coeus adapter takes Coeus 0.13 tensors.
+
+### Fixed
+
+- Measure foreign-thread allocator activity with an allocation-free
+  handshake. The test still requires the worker to allocate and release
+  1024 bytes while the parent reports zero allocations.
+
 ## Unreleased
 
 ### Changed

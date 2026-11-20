@@ -4,6 +4,9 @@
 | --- | --- | --- | --- | --- | --- | --- |
 | ASC-REL-008 | Publish the Asclepius law core through crates.io Trusted Publishing. | `asclepius`, standalone dependency sources, release workflow, and distribution docs; `asclepius-coeus` remains unpublished. | Repository-side exact-source package dry-run passes and the crates.io package identity is indexed; trusted-publishing-only configuration and the matching GitHub Release remain external release-authority actions. | patch | in-progress; milestone: M-1.0 | Aequitas and Eunomia registry releases |
 
+The response-law crate can release on its own. Publish the Coeus adapter
+after Coeus 0.13 is indexed and the adapter passes a fresh registry build.
+
 Repository-side preflight at provider head `db33cca` passes with `cargo publish
 --manifest-path crates/asclepius/Cargo.toml --package asclepius --locked
 --dry-run`: 35 files, 95.8 KiB, package verification successful. No registry
