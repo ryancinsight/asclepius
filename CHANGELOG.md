@@ -2,6 +2,15 @@
 
 All externally observable changes are recorded here.
 
+## [0.5.0] - Aequitas 0.5 provider migration
+
+### Breaking
+
+- [major] Use Aequitas 0.5 quantities at the response-law boundaries and
+  Coeus 0.14 at the adapter boundary. Consumers must update the quantity
+  and gradient providers together. The biological-response laws retain
+  their existing unit and numerical contracts.
+
 ## 0.4.0
 
 ### Added
