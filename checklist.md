@@ -1,5 +1,10 @@
 # Asclepius execution checklist
 
+## Current target 0.4.0
+
+- [ ] [major] Verify and publish the Asclepius response-law crate.
+- [ ] [minor] Verify and publish the adapter once Coeus 0.13 reaches crates.io.
+
 ## ASC-VER-016 — Close CI verification gaps
 
 - [x] Add `--locked` to every cargo gate that resolves the workspace.

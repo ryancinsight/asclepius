@@ -13,14 +13,14 @@ categories = ["science"]
 publish = false
 
 [dependencies]
-asclepius = { version = "0.3.0", path = "../asclepius" }
-coeus-autograd = { version = "0.12.0", git = "https://github.com/ryancinsight/Coeus.git", default-features = false }
-coeus-core = { version = "0.12.0", git = "https://github.com/ryancinsight/Coeus.git" }
-coeus-ops = { version = "0.12.0", git = "https://github.com/ryancinsight/Coeus.git", default-features = false }
-coeus-tensor = { version = "0.12.0", git = "https://github.com/ryancinsight/Coeus.git" }
+asclepius = { version = "0.4.0", path = "../asclepius" }
+coeus-autograd = { version = "0.13.0", git = "https://github.com/ryancinsight/Coeus.git", rev = "aab2e374ab5867d780a44aeb9a3a9d2cb5bf1259", default-features = false }
+coeus-core = { version = "0.13.0", git = "https://github.com/ryancinsight/Coeus.git", rev = "aab2e374ab5867d780a44aeb9a3a9d2cb5bf1259" }
+coeus-ops = { version = "0.13.0", git = "https://github.com/ryancinsight/Coeus.git", rev = "aab2e374ab5867d780a44aeb9a3a9d2cb5bf1259", default-features = false }
+coeus-tensor = { version = "0.13.0", git = "https://github.com/ryancinsight/Coeus.git", rev = "aab2e374ab5867d780a44aeb9a3a9d2cb5bf1259" }
 
 [dev-dependencies]
-aequitas = { version = "0.3.0", git = "https://github.com/ryancinsight/aequitas" }
+aequitas = "0.4.0"
 
 [lints]
 workspace = true
