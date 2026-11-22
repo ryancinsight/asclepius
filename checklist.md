@@ -1,5 +1,14 @@
 # Asclepius execution checklist
 
+## Stable release checklist
+
+Basis `b21df8fa4b77`, representative manifest `asclepius 0.5.0`. Target 1.0.0. [Backlog item](backlog.md#asclepius-stable-qualification).
+
+- [ ] [patch] Run the law suite on the current provider graph. Check the gEUD value and gradient independently, including the equal-dose case and nonuniform inputs, through the real adapter.
+- [ ] [arch] Resolve ASC-ARCH-017 against the scalar types supported by Coeus and document the decision before changing the adapter API. Close the law-source and scope decisions in M-law-oracles.
+- [ ] [patch] Replay the lock, MSRV, SemVer and executable book gates in M-gates-docs. Exercise the resulting core and adapter archives together in a fresh consumer.
+- [ ] [patch] Run the [release scope](docs/adr/0002-release-scope-1-0.md) exits and attach reviewed, exact-revision evidence for this member’s [Atlas qualification criteria](https://github.com/ryancinsight/atlas/blob/17b0124a7548ad81e817284afc5cb115c1d1bc78/docs/parity/repositories.json).
+
 ## Current target 0.4.0
 
 - [x] [major] Verify and publish the Asclepius response-law crate.
