@@ -1,5 +1,11 @@
 # Asclepius backlog
 
+<a id="asclepius-stable-qualification"></a>
+## ASCLEPIUS-STABLE-QUALIFICATION — asclepius stable-release qualification [patch] — todo
+- priority: verification; milestone: M-law-oracles; basis: `b21df8fa4b77`.
+- Outcome: Qualify the law core and Coeus adapter at their public scalar boundary. Follow the [release scope](docs/adr/0002-release-scope-1-0.md) and [milestone exits](backlog/milestones.md).
+- Acceptance and sequence: [stable-release checklist](checklist.md#stable-release-checklist).
+
 | ID | Outcome | Scope / non-goals | Acceptance oracle | Class | Status | Dependencies |
 | --- | --- | --- | --- | --- | --- | --- |
 | ASC-REL-008 | Publish the Asclepius law core through crates.io Trusted Publishing. | `asclepius`, standalone dependency sources, release workflow, and distribution docs. The Coeus adapter follows once its registry graph passes. | Repository-side exact-source package dry-run passes and the crates.io package identity is indexed; trusted-publishing-only configuration and the matching GitHub Release remain external release-authority actions. | patch | done; milestone: M-1.0 | Aequitas and Eunomia registry releases |
