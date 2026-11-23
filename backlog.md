@@ -2,8 +2,8 @@
 
 <a id="asclepius-stable-qualification"></a>
 ## ASCLEPIUS-STABLE-QUALIFICATION — asclepius stable-release qualification [patch] — todo
-- priority: verification; milestone: M-law-oracles; basis: `b21df8fa4b77`.
-- Outcome: Qualify the law core and Coeus adapter at their public scalar boundary. Follow the [release scope](docs/adr/0002-release-scope-1-0.md) and [milestone exits](backlog/milestones.md).
+- priority: verification; milestone: M-law-oracles; basis: `49794f842d79`.
+- Outcome: Qualify the law core and Coeus adapter at their public scalar boundary. Follow the [release scope](docs/adr/0002-release-scope-1-0.md) and [milestone exits](backlog/milestones.md). Planning targets for `asclepius` are 0.5.1, then 0.6.0 if the adapter boundary changes, then 1.0.0. Verification alone can advance the current version.
 - Acceptance and sequence: [stable-release checklist](checklist.md#stable-release-checklist).
 
 | ID | Outcome | Scope / non-goals | Acceptance oracle | Class | Status | Dependencies |
