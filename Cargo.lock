@@ -108,17 +108,19 @@ dependencies = [
 
 [[package]]
 name = "asclepius"
-version = "0.3.0"
+version = "0.3.1"
 dependencies = [
  "aequitas",
  "eunomia",
  "mnemosyne-memory",
  "proptest",
+ "tracing",
+ "tracing-subscriber",
 ]
 
 [[package]]
 name = "asclepius-coeus"
-version = "0.3.0"
+version = "0.3.1"
 dependencies = [
  "aequitas",
  "asclepius",

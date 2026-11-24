@@ -2,6 +2,16 @@
 
 All externally observable changes are recorded here.
 
+## 0.3.1 - Unreleased
+
+### Fixed
+
+- Preserve small positive probabilities when composing independent insults.
+  Direct union accumulation removes subtraction of a near-one survival product,
+  preserving singleton identity and subnormal contributions in the scalar's
+  native precision. Existing public types and the zero-allocation strategy stay
+  unchanged. No arbitrary-length correct-rounding guarantee is introduced.
+
 ## Unreleased
 
 ### Fixed

@@ -1,5 +1,21 @@
 # Asclepius execution checklist
 
+## Active target: 0.3.1
+
+### ASC-COR-022 — Independent probability composition [patch]
+
+- [x] Reproduce cancellation on unchanged main with native public-API controls.
+- [x] Add singleton, tiny-pair, zero/certain-input and exact dyadic regressions.
+- [x] Implement native-precision union recurrence with its induction argument.
+- [x] Pass strict lint, format, Rust 1.95 all-target checks and eight doctests.
+- [ ] Complete core/package qualification: both feature suites retain the
+      baseline allocation failure (17 pass, one fail); provider integration
+      and normalized-package qualification remain open.
+- [ ] Obtain independent review on the exact final revision.
+- [ ] Pass intact push hooks and applicable hosted/required review gates.
+- [ ] Resolve existing provider/registry holds before merge or publication.
+
+
 ## ASC-VER-016 — Close CI verification gaps
 
 - [x] Add `--locked` to every cargo gate that resolves the workspace.
