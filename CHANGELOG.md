@@ -32,6 +32,18 @@ All externally observable changes are recorded here.
 
 ## Unreleased
 
+### Breaking
+
+- [major] Use Coeus 0.15 at the adapter boundary.
+  `generalized_equivalent_uniform_dose` takes and returns Coeus 0.15
+  `Var` values, its backend bounds name the Coeus 0.15 `BackendOps`
+  and CPU-addressable storage traits, and `AutodiffResponseError`
+  defaults to the Coeus 0.15 `BackendError`. Coeus 0.14 and 0.15 are
+  incompatible 0.x releases, so a consumer that names Coeus types must
+  require Coeus 0.15 in the same change as this adapter. The adapter
+  source, the gEUD numerical contract, and the `asclepius` law crate
+  are unchanged.
+
 ### Changed
 
 - Admit Leto 0.50.0 in the lock. Asclepius reaches Leto through Coeus 0.12.0
