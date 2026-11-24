@@ -2,18 +2,66 @@
 
 All externally observable changes are recorded here.
 
-## 0.3.1 - Unreleased
+## Unreleased
 
 ### Fixed
 
-- Preserve small positive probabilities when composing independent insults.
-  Direct union accumulation removes subtraction of a near-one survival product,
-  preserving singleton identity and subnormal contributions in the scalar's
-  native precision. Larger-first pair ordering and native fused multiply-add
-  preserve monotonicity and give a symmetric two-insult union. Existing public
-  types and the zero-allocation strategy stay unchanged. No arbitrary-length correct-rounding guarantee is introduced.
+- Preserve small independent probabilities, including subnormal singletons, when
+  combining response estimates. Two-input composition is symmetric and monotone
+  in each probability.
+
+## [0.5.0] - Aequitas 0.5 provider migration
+
+### Breaking
+
+- [major] Use Aequitas 0.5 quantities at the response-law boundaries and
+  Coeus 0.14 at the adapter boundary. Consumers must update the quantity
+  and gradient providers together. The biological-response laws retain
+  their existing unit and numerical contracts.
+
+## 0.4.0
+
+### Added
+
+- Distribute the Coeus adapter as `asclepius-coeus` with registry
+  Coeus 0.13 and the Asclepius 0.4 response-law crate.
+
+### Breaking
+
+- Use registry Aequitas 0.4 for public dose, time, and temperature types
+  and Eunomia 0.12.1 for scalar contracts. Update direct Aequitas
+  requirements to 0.4. The Coeus adapter takes Coeus 0.13 tensors.
+
+### Fixed
+
+- Measure foreign-thread allocator activity with an allocation-free
+  handshake. The test still requires the worker to allocate and release
+  1024 bytes while the parent reports zero allocations.
 
 ## Unreleased
+
+### Changed
+
+- Admit Leto 0.50.0 in the lock. Asclepius reaches Leto through Coeus 0.12.0
+  and Apollo 0.29.5, both of which still demand `<0.49.0`, so `Cargo.lock`
+  moves three first-party rows onto their first default-branch revisions whose
+  Leto bounds admit 0.50: Coeus `7e1ded59` (from `5033ec53`), Apollo
+  `b7bffe1c` (from `0c651487`) and Leto `6483eac3` (from `39d65120`), with
+  `leto` and `leto-ops` at 0.50.0. Leto 0.50 removes the `VecStorage::uninit`
+  constructor so it is a breaking change for the provider, but Asclepius calls
+  no `VecStorage` method, owns no Leto or Apollo type in its public surface,
+  and its Coeus adapter imports only `coeus-autograd`, `coeus-core`,
+  `coeus-ops` and `coeus-tensor` items, so no source change is needed. `cargo metadata --locked` resolves the
+  export outside the Atlas dependency overlay, which leaves the lock
+  byte-identical and its git source rows intact.
+
+- Advance the Moirai provider contract from 0.11.4 to 0.12.0 and refresh every
+  first-party lock row onto its repository's current default head. The lock is
+  regenerated outside the Atlas dependency overlay, so the `source = "git+..."`
+  rows survive and the registry rows are unchanged. Moirai 0.12.0 removes the
+  required `StateWord::get_mut` method, which Asclepius neither implements nor
+  calls, and Asclepius re-exports no Moirai or Eunomia type, so the public
+  Asclepius surface is unchanged.
 
 ### Fixed
 

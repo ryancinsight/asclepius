@@ -1,22 +1,23 @@
 # Asclepius execution checklist
 
-## Active target: 0.3.1
+## Stable release checklist
 
-### ASC-COR-022 — Independent probability composition [patch]
+Basis `49794f842d79`, representative manifest `asclepius 0.5.0`. Target 1.0.0. [Backlog item](backlog.md#asclepius-stable-qualification).
 
-- [x] Reproduce cancellation on unchanged main with native public-API controls.
-- [x] Add singleton, tiny-pair, zero/certain-input and exact dyadic regressions.
-- [x] Implement native-precision ordered fused union recurrence with its induction argument.
-- [x] Reproduce the first candidate's adjacent-value inversion and add native
-      primitive/wrapper witnesses plus shrinking monotonicity properties.
-- [x] Pass strict lint, format, Rust 1.95 all-target checks and eight doctests.
-- [ ] Complete core/package qualification: both feature suites retain the
-      baseline allocation failure (19 pass, one fail); provider integration
-      and normalized-package qualification remain open.
-- [ ] Obtain independent review on the exact final revision.
-- [ ] Pass intact push hooks and applicable hosted/required review gates.
-- [ ] Resolve existing provider/registry holds before merge or publication.
+- [ ] [patch] Run the law suite on the current provider graph. Check the gEUD value and gradient independently, including the equal-dose case and nonuniform inputs, through the real adapter.
+- [ ] [arch] Resolve ASC-ARCH-017 against the scalar types supported by Coeus and document the decision before changing the adapter API. Close the law-source and scope decisions in M-law-oracles.
+- [ ] [patch] Replay the lock, MSRV, SemVer and executable book gates in M-gates-docs. Exercise the resulting core and adapter archives together in a fresh consumer.
+- [ ] [patch] **0.5.1.** Evaluate uniform and unequal dose arrays through core and the Coeus adapter. Check the uniform identity and directional derivative independently, including the adapter’s declared scalar boundary. [Source and baseline](gap_audit.md#incremental-release-baseline).
+- [ ] [arch] **0.6.0 if the adapter boundary changes.** Obtain the ASC-ARCH-017 decision. Check the documented scalar contract and migrate the Coeus caller if it changes. If the current API suffices, take the verified patch line to beta.
+- [ ] [major] **1.0.0-beta.1 → 1.0.0-rc.1 → 1.0.0.** Freeze the supported surface at beta. The same law suite and executable documentation pass against packaged core and adapter with the supported compiler. Repeat the applicable exits on the exact RC before stable promotion. Run the [release scope](docs/adr/0002-release-scope-1-0.md) exits and attach reviewed, exact-revision evidence for this member’s [Atlas qualification criteria](https://github.com/ryancinsight/atlas/blob/17b0124a7548ad81e817284afc5cb115c1d1bc78/docs/parity/repositories.json).
 
+## Current target 0.4.0
+
+- [x] [major] Verify and publish the Asclepius response-law crate.
+      [Release](https://github.com/ryancinsight/asclepius/releases/tag/crate-asclepius-v0.4.0)
+- [x] [minor] Resolve the registry Coeus 0.13 graph and verify the adapter.
+- [x] [minor] Publish the adapter and verify a fresh crates.io consumer.
+      [Release](https://github.com/ryancinsight/asclepius/releases/tag/asclepius-coeus-v0.4.0)
 
 ## ASC-VER-016 — Close CI verification gaps
 
@@ -35,10 +36,8 @@
       asclepius --locked --dry-run` at provider head `db33cca`. Cargo confirms
       the existing crates.io package identity, packages 35 files (95.8 KiB),
       and verifies the package successfully.
-- [ ] Configure and verify the crates.io Trusted Publisher, enable
-      trusted-publishing-only mode, and create the matching GitHub Release.
-      This remains an external release-authority action; repository-side
-      packaging is complete.
+- [x] Verify the 0.4.0 trusted-publisher workflow and release tag.
+      [Workflow](https://github.com/ryancinsight/asclepius/actions/runs/44652256475)
 - [x] Audit current Helios and Kwavers response ownership.
 - [x] Verify primary mathematical sources and model limitations.
 - [x] Add the required Aequitas dimensional vocabulary.
@@ -69,10 +68,6 @@ on it, and so that book items wait for the in-flight book CI branch.
       `LogisticControlProbability`, `LymanComplicationProbability`, `Cem43`,
       `ArrheniusDamage`, and the Coeus adapter. The sources exist only in
       README.md today.
-- [ ] ASC-VER-010: add off-midpoint TCP and NTCP reference cases. Confirm the
-      new assertions fail when the Niemierko `4` factor or the Lyman `TD50`
-      normalization is perturbed, since every current assertion holds for any
-      positive parameter value.
 - [ ] ASC-VER-013: add a Niemierko or TG-166 worked gEUD value as an
       independent oracle beside the existing same-formula differential test.
 - [ ] ASC-VER-011: add an Arrhenius case with published kinetic parameters at

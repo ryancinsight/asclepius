@@ -1,33 +1,22 @@
 # Asclepius backlog
 
-<a id="asc-cor-022"></a>
-## ASC-COR-022 — Preserve small independent-insult probabilities [patch] — blocked
-
-- Priority: correctness.
-- Owner: `codex:01a19d1d-0a37-747b-b2d9-ae6e622080cb`; branch
-  `fix/independent-insults-small-probabilities`.
-- Scope: `IndependentInsults` only, with regression tests, native-precision
-  theorem documentation and an atomic 0.3.1 version update. PR #110 and the
-  protected thermal/provider work are unchanged.
-- Reproduction: current main `13bbff1e` returns zero for singleton probabilities
-  `2^-30` in binary32 and `2^-60` in binary64, including positive subnormals.
-- Repair: accumulate `h + (1 - h) * l` from zero with the larger input
-  `h` and smaller input `l`, using native fused multiply-add. Pair ordering closes a review-detected adjacent-
-  value inversion in the first unsorted candidate. Induction gives the same
-  independent survival-product law without final near-one cancellation.
-- Acceptance: failing baseline identities, fixed native primitive/wrapper
-  controls, existing core tests, lint/docs, exact-head independent review,
-  normal hooks, hosted gates and coherent-provider/package qualification.
-- Status: six new regression groups pass, as do lint, format, MSRV and
-  eight doctests. Both complete core feature runs pass 19 tests and fail the
-  unchanged allocation gate, also reproduced on exact main. Final review,
-  coherent-provider/package qualification and delivery remain pending.
-  Existing provider, registry, deployment and owner holds remain.
-
+<a id="asclepius-stable-qualification"></a>
+## ASCLEPIUS-STABLE-QUALIFICATION — asclepius stable-release qualification [patch] — todo
+- priority: verification; milestone: M-law-oracles; basis: `49794f842d79`.
+- Outcome: Qualify the law core and Coeus adapter at their public scalar boundary. Follow the [release scope](docs/adr/0002-release-scope-1-0.md) and [milestone exits](backlog/milestones.md). Planning targets for `asclepius` are 0.5.1, then 0.6.0 if the adapter boundary changes, then 1.0.0. Verification alone can advance the current version.
+- Acceptance and sequence: [stable-release checklist](checklist.md#stable-release-checklist).
 
 | ID | Outcome | Scope / non-goals | Acceptance oracle | Class | Status | Dependencies |
 | --- | --- | --- | --- | --- | --- | --- |
-| ASC-REL-008 | Publish the Asclepius law core through crates.io Trusted Publishing. | `asclepius`, standalone dependency sources, release workflow, and distribution docs; `asclepius-coeus` remains unpublished. | Repository-side exact-source package dry-run passes and the crates.io package identity is indexed; trusted-publishing-only configuration and the matching GitHub Release remain external release-authority actions. | patch | in-progress | Aequitas and Eunomia registry releases |
+| ASC-REL-008 | Publish the Asclepius law core through crates.io Trusted Publishing. | `asclepius`, standalone dependency sources, release workflow, and distribution docs. The Coeus adapter follows once its registry graph passes. | Repository-side exact-source package dry-run passes and the crates.io package identity is indexed; trusted-publishing-only configuration and the matching GitHub Release remain external release-authority actions. | patch | done; milestone: M-1.0 | Aequitas and Eunomia registry releases |
+
+Asclepius 0.4.0 is published. The registry archive matches the merge
+revision, and a fresh consumer checks the typed response at its exact
+midpoint. [Release evidence](https://github.com/ryancinsight/asclepius/actions/runs/44652256475)
+
+The Coeus adapter 0.4.0 [minor] is published. A clean registry consumer
+verifies the generalized equivalent uniform dose of 3 Gy and 4 Gy and its
+analytical gradient. [Release](https://github.com/ryancinsight/asclepius/releases/tag/asclepius-coeus-v0.4.0)
 
 Repository-side preflight at provider head `db33cca` passes with `cargo publish
 --manifest-path crates/asclepius/Cargo.toml --package asclepius --locked
@@ -35,6 +24,8 @@ Repository-side preflight at provider head `db33cca` passes with `cargo publish
 publication or account-setting claim is inferred from the dry run.
 
 ## ASC-VER-016 — Close CI verification gaps [patch] — in progress
+
+- **Milestone:** M-gates-docs.
 
 - **Owner:** Codex; branch `ci/asclepius-gates`.
 - **Scope:** `.github/workflows/ci.yml`, this backlog, and the provider
@@ -64,15 +55,14 @@ cites a file and line.
 
 | ID | Outcome | Scope / non-goals | Acceptance oracle | Class | Status | Dependencies |
 | --- | --- | --- | --- | --- | --- | --- |
-| ASC-VER-010 | Anchor TCP and NTCP against parameter-sensitive published values. | `tests/radiation_theorems.rs` assertions for `LogisticControlProbability` and `LymanComplicationProbability`; no model or parameter-type change. | A test evaluates each law at a dose away from its midpoint and compares against a value computed from the published closed form with a derived tolerance, such that changing the Niemierko exponent factor `4` (`response/radiation/logistic_control.rs:82`) or dropping the `TD50` factor from the Lyman normalization (`response/radiation/normal_complication.rs:70`) fails the suite. | patch | todo | none |
-| ASC-VER-011 | Exercise Arrhenius damage with published kinetic parameters. | One reference case in `tests/thermal_theorems.rs` using Henriques-Moritz or Pearce `A`/`Ea` values at a physiological absolute temperature; no change to the law. | The case asserts the damage integral against the closed-form `A exp(-Ea/(RT)) t` evaluated from the cited parameters, with the citation recorded at the assertion site. | patch | todo | ASC-DOC-012 |
-| ASC-VER-013 | Anchor gEUD against an independent published value. | One reference case in `tests/radiation_theorems.rs`; no change to `GeneralizedEquivalentUniformDose`. | The existing differential test (`tests/radiation_theorems.rs:83-97`) recomputes the same power mean and is not an independent oracle; a new case reproduces a worked gEUD value from Niemierko or AAPM TG-166 with a derived tolerance. | patch | todo | ASC-DOC-012 |
-| ASC-VER-018 | Cross-check the Coeus gEUD gradient with a finite-difference oracle and document the derivation. | `asclepius-coeus/tests/equivalent_uniform_dose.rs` plus a gradient theorem in ADR 0001 and the adapter Rustdoc; no adapter behaviour change. | A central-difference gradient over the fixture doses agrees with the tape gradient inside a step-size-derived bound, and the closed form currently hard-coded at `tests/equivalent_uniform_dose.rs:44-47` is stated and derived in the adapter Rustdoc. | patch | todo | none |
-| ASC-DOC-012 | Place the defining sources beside the invariants they ground. | Rustdoc on the five law types and the adapter; README source list stays. | `grep -rn "doi\|DOI\|PMID" crates` returns a locator for each of gEUD, TCP, NTCP, CEM43, and Arrhenius; it currently returns zero matches while README.md lists six defining sources. | patch | todo | none |
-| ASC-DOC-014 | Give the book chapters for the thermal, composition, and tissue boundary bullets. | `docs/book/SUMMARY.md` and new chapters; the in-flight book CI branch owns existing chapter edits. | SUMMARY.md covers all five README boundary bullets; it currently stops at gEUD and TCP/NTCP, and `docs/book/README.md` is a two-line stub. | patch | todo | book CI branch `ci/asclepius-book-test` lands |
-| ASC-VER-015 | Make the book code fragments executable so the `mdbook-test` gate is not vacuous. | The six `rust,ignore` fences at `docs/book/geud.md:34`, `docs/book/response_values.md:17,35`, `docs/book/tcp_ntcp.md:27,55`; no prose rewrite. | `mdbook test` compiles every Rust fence in the book; only the two `{{#include}}` example pages compile today, so the `mdbook-test: true` step added in `.github/workflows/book-pages.yml:22` cannot detect API drift in the prose. | patch | todo | book CI branch `ci/asclepius-book-test` lands |
-| ASC-VER-016 | Close the CI gate gaps the ADR verification section already claims. | `.github/workflows/ci.yml`; no change to the law crates. | Every cargo invocation carries `--locked`; a `cargo-semver-checks` step exists (ADR 0001 claims a semver gate but no workflow runs one); a job builds at the declared MSRV `1.95` (`Cargo.toml:7`, while `rust-toolchain.toml` pins `1.97.0`); `cargo doc` runs under `RUSTDOCFLAGS=-D warnings`. | patch | todo | none |
-| ASC-DOC-019 | Bring the README example under a compiled gate. | `crates/asclepius/src/lib.rs` crate docs and the README example block. | The README example compiles in CI. `grep -rn include_str crates` returns no matches, so the example in README.md is verified by no gate and can rot against the API. | patch | todo | none |
-| ASC-ARCH-017 | Decide and record the Coeus adapter scalar dimension. | `asclepius-coeus/src/response/radiation/equivalent_uniform_dose.rs`; an ADR revision if the fix is a documented restriction rather than a generalization. | The adapter is either generic over the scalar the way the law core is, or ADR 0001 records why Coeus fixes it. `generalized_equivalent_uniform_dose` takes `&Var<f64, B>` (`equivalent_uniform_dose.rs:52`) while the core monomorphizes over `T: eunomia::RealField`, so `f32` planning tapes are foreclosed. Confirm what Coeus scalars `Var` supports before choosing. | minor | todo | none |
-| ASC-SCOPE-021 | Settle whether fractionation response belongs in Asclepius. | An ADR 0001 revision or a new ADR recording the decision; no speculative implementation. | The linear-quadratic model with repair and repopulation, BED/EQD2, alpha-beta handling, and the Kutcher-Burman effective-volume reduction are each recorded as owned or explicitly out of scope. The README boundary claims none of them, yet it cites the Kutcher-Burman volume reduction as a defining source while `response/radiation/normal_complication.rs` implements only the uniform-dose Lyman sigmoid with no volume parameter. | minor, arch | todo | none |
-| ASC-PM-020 | Make the ADR index regeneration instruction resolvable in a standalone checkout. | `docs/adr/README.md` header, or a committed generator; the index rows stay generated. | The regeneration command named in the index header runs from an Asclepius clone. It currently reads `python scripts/adr-index.py generate` while the repository tracks no `scripts/` directory, so the path resolves only from the Atlas meta-repo. | patch | todo | Atlas ADR index tooling owner |
+| ASC-VER-011 | Exercise Arrhenius damage with published kinetic parameters. | One reference case in `tests/thermal_theorems.rs` using Henriques-Moritz or Pearce `A`/`Ea` values at a physiological absolute temperature; no change to the law. | The case asserts the damage integral against the closed-form `A exp(-Ea/(RT)) t` evaluated from the cited parameters, with the citation recorded at the assertion site. | patch | todo; milestone: M-law-oracles | ASC-DOC-012 |
+| ASC-VER-013 | Anchor gEUD against an independent published value. | One reference case in `tests/radiation_theorems.rs`; no change to `GeneralizedEquivalentUniformDose`. | The existing differential test (`tests/radiation_theorems.rs:83-97`) recomputes the same power mean and is not an independent oracle; a new case reproduces a worked gEUD value from Niemierko or AAPM TG-166 with a derived tolerance. | patch | todo; milestone: M-law-oracles | ASC-DOC-012 |
+| ASC-VER-018 | Cross-check the Coeus gEUD gradient with a finite-difference oracle and document the derivation. | `asclepius-coeus/tests/equivalent_uniform_dose.rs` plus a gradient theorem in ADR 0001 and the adapter Rustdoc; no adapter behaviour change. | A central-difference gradient over the fixture doses agrees with the tape gradient inside a step-size-derived bound, and the closed form currently hard-coded at `tests/equivalent_uniform_dose.rs:44-47` is stated and derived in the adapter Rustdoc. | patch | todo; milestone: M-law-oracles | none |
+| ASC-DOC-012 | Place the defining sources beside the invariants they ground. | Rustdoc on the five law types and the adapter; README source list stays. | `grep -rn "doi\|DOI\|PMID" crates` returns a locator for each of gEUD, TCP, NTCP, CEM43, and Arrhenius; it currently returns zero matches while README.md lists six defining sources. | patch | todo; milestone: M-law-oracles | none |
+| ASC-DOC-014 | Give the book chapters for the thermal, composition, and tissue boundary bullets. | `docs/book/SUMMARY.md` and new chapters; the in-flight book CI branch owns existing chapter edits. | SUMMARY.md covers all five README boundary bullets; it currently stops at gEUD and TCP/NTCP, and `docs/book/README.md` is a two-line stub. | patch | todo; milestone: M-gates-docs | book CI branch `ci/asclepius-book-test` lands |
+| ASC-VER-015 | Make the book code fragments executable so the `mdbook-test` gate is not vacuous. | The six `rust,ignore` fences at `docs/book/geud.md:34`, `docs/book/response_values.md:17,35`, `docs/book/tcp_ntcp.md:27,55`; no prose rewrite. | `mdbook test` compiles every Rust fence in the book; only the two `{{#include}}` example pages compile today, so the `mdbook-test: true` step added in `.github/workflows/book-pages.yml:22` cannot detect API drift in the prose. | patch | todo; milestone: M-gates-docs | book CI branch `ci/asclepius-book-test` lands |
+| ASC-VER-016 | Close the CI gate gaps the ADR verification section already claims. | `.github/workflows/ci.yml`; no change to the law crates. | Every cargo invocation carries `--locked`; a `cargo-semver-checks` step exists (ADR 0001 claims a semver gate but no workflow runs one); a job builds at the declared MSRV `1.95` (`Cargo.toml:7`, while `rust-toolchain.toml` pins `1.97.0`); `cargo doc` runs under `RUSTDOCFLAGS=-D warnings`. | patch | todo; milestone: M-gates-docs | none |
+| ASC-DOC-019 | Bring the README example under a compiled gate. | `crates/asclepius/src/lib.rs` crate docs and the README example block. | The README example compiles in CI. `grep -rn include_str crates` returns no matches, so the example in README.md is verified by no gate and can rot against the API. | patch | todo; milestone: M-gates-docs | none |
+| ASC-ARCH-017 | Decide and record the Coeus adapter scalar dimension. | `asclepius-coeus/src/response/radiation/equivalent_uniform_dose.rs`; an ADR revision if the fix is a documented restriction rather than a generalization. | The adapter is either generic over the scalar the way the law core is, or ADR 0001 records why Coeus fixes it. `generalized_equivalent_uniform_dose` takes `&Var<f64, B>` (`equivalent_uniform_dose.rs:52`) while the core monomorphizes over `T: eunomia::RealField`, so `f32` planning tapes are foreclosed. Confirm what Coeus scalars `Var` supports before choosing. | minor | todo; milestone: M-law-oracles | none |
+| ASC-SCOPE-021 | Settle whether fractionation response belongs in Asclepius. | An ADR 0001 revision or a new ADR recording the decision; no speculative implementation. | The linear-quadratic model with repair and repopulation, BED/EQD2, alpha-beta handling, and the Kutcher-Burman effective-volume reduction are each recorded as owned or explicitly out of scope. The README boundary claims none of them, yet it cites the Kutcher-Burman volume reduction as a defining source while `response/radiation/normal_complication.rs` implements only the uniform-dose Lyman sigmoid with no volume parameter. | minor, arch | todo; milestone: M-law-oracles | none |
+| ASC-PM-020 | Make the ADR index regeneration instruction resolvable in a standalone checkout. | `docs/adr/README.md` header, or a committed generator; the index rows stay generated. | The regeneration command named in the index header runs from an Asclepius clone. It currently reads `python scripts/adr-index.py generate` while the repository tracks no `scripts/` directory, so the path resolves only from the Atlas meta-repo. | patch | todo; milestone: M-gates-docs | Atlas ADR index tooling owner |
