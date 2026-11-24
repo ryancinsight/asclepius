@@ -121,3 +121,63 @@ fn exact_dyadic_composition_matches_the_product_theorem() {
         });
     });
 }
+
+fn check_monotone<T: RealField>(lower: T, upper: T, other: T) {
+    let before = composed([lower, other]);
+    let after = composed([upper, other]);
+    let reversed = composed([other, lower]);
+    info_span!("assert").in_scope(|| {
+        assert!(after >= before, "increasing an insult reduced composition");
+        assert!(before >= lower && before >= other);
+        assert_eq!(before, reversed, "a two-insult union is symmetric");
+    });
+}
+
+#[test]
+fn increasing_an_insult_preserves_monotonicity_at_rounding_boundaries() {
+    traced(|| {
+        // Adjacent represented inputs straddle a rounded-complement boundary.
+        // The unsorted union recurrence decreases its output by one ULP.
+        let lower = f32::from_bits(0x3c89_d590);
+        let upper = f32::from_bits(0x3c89_d591);
+        let other = f32::from_bits(0x3d9d_9625);
+        check_monotone(lower, upper, other);
+        check_monotone(
+            eunomia::F32(lower),
+            eunomia::F32(upper),
+            eunomia::F32(other),
+        );
+        let lower = f64::from_bits(0x3fd1_92d1_bbf8_c226);
+        let upper = f64::from_bits(0x3fd1_92d1_bbf8_c227);
+        let other = f64::from_bits(0x3fed_1705_9345_0b05);
+        check_monotone(lower, upper, other);
+        check_monotone(
+            eunomia::F64(lower),
+            eunomia::F64(upper),
+            eunomia::F64(other),
+        );
+    });
+}
+
+proptest::proptest! {
+    #[test]
+    fn adjacent_probabilities_preserve_the_union_order(
+        lower_bits in 0_u32..0x3f80_0000_u32,
+        other_bits in 0_u32..=0x3f80_0000_u32,
+        extended_lower_bits in 0_u64..0x3ff0_0000_0000_0000_u64,
+        extended_other_bits in 0_u64..=0x3ff0_0000_0000_0000_u64,
+    ) {
+        traced(|| {
+            check_monotone(
+                f32::from_bits(lower_bits),
+                f32::from_bits(lower_bits + 1),
+                f32::from_bits(other_bits),
+            );
+            check_monotone(
+                f64::from_bits(extended_lower_bits),
+                f64::from_bits(extended_lower_bits + 1),
+                f64::from_bits(extended_other_bits),
+            );
+        });
+    }
+}

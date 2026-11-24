@@ -17,8 +17,8 @@ fn independent_insults_match_survival_product() {
     let combined = IndependentInsults::<2>
         .evaluate(&mechanisms)
         .expect("validated inputs");
-    // Three subtractions and one multiplication accumulate at most four
-    // first-order roundings; decimal 0.2/0.3/0.44 are not binary-exact.
+    // The ordered union uses a complement, product and sum after the exact
+    // first singleton step; decimal 0.2/0.3/0.44 are not binary-exact.
     assert!((combined.get() - 0.44).abs() <= 4.0 * f64::EPSILON);
 
     let none: [Probability<f64>; 0] = [];

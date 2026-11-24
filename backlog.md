@@ -1,20 +1,25 @@
 # Asclepius backlog
 
-## ASC-COR-022 — Preserve small independent-insult probabilities [patch]
+<a id="asc-cor-022"></a>
+## ASC-COR-022 — Preserve small independent-insult probabilities [patch] — blocked
 
-- Owner: Atlas correctness review; branch `fix/independent-insults-small-probabilities`.
+- Priority: correctness.
+- Owner: `codex:01a19d1d-0a37-747b-b2d9-ae6e622080cb`; branch
+  `fix/independent-insults-small-probabilities`.
 - Scope: `IndependentInsults` only, with regression tests, native-precision
   theorem documentation and an atomic 0.3.1 version update. PR #110 and the
   protected thermal/provider work are unchanged.
 - Reproduction: current main `13bbff1e` returns zero for singleton probabilities
   `2^-30` in binary32 and `2^-60` in binary64, including positive subnormals.
-- Repair: accumulate `c + (1 - c) * p` from zero. Induction gives the same
+- Repair: accumulate `h + (1 - h) * l` from zero with the larger input
+  `h` and smaller input `l`, using native fused multiply-add. Pair ordering closes a review-detected adjacent-
+  value inversion in the first unsorted candidate. Induction gives the same
   independent survival-product law without final near-one cancellation.
 - Acceptance: failing baseline identities, fixed native primitive/wrapper
   controls, existing core tests, lint/docs, exact-head independent review,
   normal hooks, hosted gates and coherent-provider/package qualification.
-- Status: four new regression groups pass, as do lint, format, MSRV and
-  eight doctests. Both complete core feature runs pass 17 tests and fail the
+- Status: six new regression groups pass, as do lint, format, MSRV and
+  eight doctests. Both complete core feature runs pass 19 tests and fail the
   unchanged allocation gate, also reproduced on exact main. Final review,
   coherent-provider/package qualification and delivery remain pending.
   Existing provider, registry, deployment and owner holds remain.

@@ -6,10 +6,12 @@
 
 - [x] Reproduce cancellation on unchanged main with native public-API controls.
 - [x] Add singleton, tiny-pair, zero/certain-input and exact dyadic regressions.
-- [x] Implement native-precision union recurrence with its induction argument.
+- [x] Implement native-precision ordered fused union recurrence with its induction argument.
+- [x] Reproduce the first candidate's adjacent-value inversion and add native
+      primitive/wrapper witnesses plus shrinking monotonicity properties.
 - [x] Pass strict lint, format, Rust 1.95 all-target checks and eight doctests.
 - [ ] Complete core/package qualification: both feature suites retain the
-      baseline allocation failure (17 pass, one fail); provider integration
+      baseline allocation failure (19 pass, one fail); provider integration
       and normalized-package qualification remain open.
 - [ ] Obtain independent review on the exact final revision.
 - [ ] Pass intact push hooks and applicable hosted/required review gates.
