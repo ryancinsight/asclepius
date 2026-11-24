@@ -2,6 +2,14 @@
 
 All externally observable changes are recorded here.
 
+## Unreleased
+
+### Fixed
+
+- Preserve small independent probabilities, including subnormal singletons, when
+  combining response estimates. Two-input composition is symmetric and monotone
+  in each probability.
+
 ## [0.5.0] - Aequitas 0.5 provider migration
 
 ### Breaking
