@@ -3,12 +3,13 @@
 <a id="asclepius-stable-qualification"></a>
 ## ASCLEPIUS-STABLE-QUALIFICATION — asclepius stable-release qualification [patch] — todo
 - priority: verification; milestone: M-law-oracles; basis: `49794f842d79`.
-- Outcome: Qualify the law core and Coeus adapter at their public scalar boundary. Follow the [release scope](docs/adr/0002-release-scope-1-0.md) and [milestone exits](backlog/milestones.md). Planning targets for `asclepius` are 0.5.1, then 0.6.0 if the adapter boundary changes, then 1.0.0. Verification alone can advance the current version.
+- Outcome: Qualify the law core and Coeus adapter at their public scalar boundary. Follow the [release scope](docs/adr/0002-release-scope-1-0.md) and [milestone exits](backlog/milestones.md). The adapter boundary has changed: since #130 `asclepius-coeus` names Coeus 0.15 types, a break recorded in the [changelog](CHANGELOG.md), so the next release of `asclepius-coeus` is 0.6.0 (ASC-REL-009, blocked on release authority). Planning targets for `asclepius` are 0.5.1, then 0.6.0, then 1.0.0. Verification alone can advance the current version.
 - Acceptance and sequence: [stable-release checklist](checklist.md#stable-release-checklist).
 
 | ID | Outcome | Scope / non-goals | Acceptance oracle | Class | Status | Dependencies |
 | --- | --- | --- | --- | --- | --- | --- |
 | ASC-REL-008 | Publish the Asclepius law core through crates.io Trusted Publishing. | `asclepius`, standalone dependency sources, release workflow, and distribution docs. The Coeus adapter follows once its registry graph passes. | Repository-side exact-source package dry-run passes and the crates.io package identity is indexed; trusted-publishing-only configuration and the matching GitHub Release remain external release-authority actions. | patch | done; milestone: M-1.0 | Aequitas and Eunomia registry releases |
+| ASC-REL-009 | Release `asclepius-coeus` 0.6.0, which carries the Coeus 0.15 adapter break. | Version bump, tag and publication of `asclepius-coeus` 0.6.0; no adapter source change. Re-open trigger: the user names the release. | Exact-source package dry-run passes for `asclepius-coeus`; the changelog `Unreleased` entries move under 0.6.0; a fresh consumer on Coeus 0.15 checks the typed gEUD value and gradient. | major | blocked; milestone: M-1.0 | Release authority |
 
 Asclepius 0.4.0 is published. The registry archive matches the merge
 revision, and a fresh consumer checks the typed response at its exact
