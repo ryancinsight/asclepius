@@ -4,7 +4,7 @@
 
 Reviewed [asclepius 0.5.0](crates/asclepius/Cargo.toml) at [49794f842d79](https://github.com/ryancinsight/asclepius/tree/49794f842d7990a72d1118f191cd826a74b168d5). The exact version appears in the [registry](https://crates.io/crates/asclepius/0.5.0).
 
-The next [patch] checkpoint uses [equivalent uniform dose](crates/asclepius-coeus/tests/equivalent_uniform_dose.rs). [Target version and acceptance criteria](checklist.md#stable-release-checklist).
+The 0.6.0 release, the next workspace release, uses [equivalent uniform dose](crates/asclepius-coeus/tests/equivalent_uniform_dose.rs) as its checkpoint. [Target version and acceptance criteria](checklist.md#stable-release-checklist).
 
 The Atlas board check reports 1 existing schema finding, including `ASC-VER-016`. Verify each item against its delivery evidence, archive completed work and rerun the board check before the freeze.
 
